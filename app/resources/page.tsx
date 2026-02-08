@@ -1,6 +1,7 @@
 "use client"
 
 import { Sidebar } from "@/components/Sidebar"
+import Link from "next/link"
 
 const resources = [
   {
@@ -9,7 +10,8 @@ const resources = [
     icon: "psychology",
     type: "Guide",
     color: "text-purple-500",
-    bgColor: "bg-purple-100 dark:bg-purple-500/10"
+    bgColor: "bg-purple-100 dark:bg-purple-500/10",
+    href: "/quiz/generator"
   },
   {
     title: "Effective Memory Techniques",
@@ -17,7 +19,8 @@ const resources = [
     icon: "brain",
     type: "Article",
     color: "text-emerald-500",
-    bgColor: "bg-emerald-100 dark:bg-emerald-500/10"
+    bgColor: "bg-emerald-100 dark:bg-emerald-500/10",
+    href: "/study/explanation"
   },
   {
     title: "StudyFlow Shortcuts",
@@ -25,7 +28,8 @@ const resources = [
     icon: "bolt",
     type: "Tool",
     color: "text-orange-500",
-    bgColor: "bg-orange-100 dark:bg-orange-500/10"
+    bgColor: "bg-orange-100 dark:bg-orange-500/10",
+    href: "/profile"
   },
   {
     title: "Focus Music Playlists",
@@ -33,23 +37,25 @@ const resources = [
     icon: "music_note",
     type: "Media",
     color: "text-blue-500",
-    bgColor: "bg-blue-100 dark:bg-blue-500/10"
+    bgColor: "bg-blue-100 dark:bg-blue-500/10",
+    href: "#"
   }
 ]
 
 export default function Resources() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-background-dark">
+    <div className="flex min-h-screen w-full bg-slate-50 dark:bg-background-dark">
       <Sidebar />
-      <main className="flex-1 flex flex-col overflow-y-auto p-8">
+      <main className="flex-1 p-8">
         <div className="max-w-4xl mx-auto w-full">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Resources Library</h1>
           <p className="text-slate-500 dark:text-text-secondary mb-8">Curated guides and tools to supercharge your learning experience.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {resources.map((res, i) => (
-              <div
+              <Link
                 key={i}
+                href={res.href}
                 className="group flex flex-col p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer"
               >
                 <div className={`size-12 rounded-xl ${res.bgColor} flex items-center justify-center ${res.color} mb-4 group-hover:scale-110 transition-transform`}>
@@ -66,7 +72,7 @@ export default function Resources() {
                 <p className="text-sm text-slate-500 dark:text-text-secondary leading-relaxed">
                   {res.description}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
