@@ -4,14 +4,39 @@ import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 
 function LoginForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+  const [isLogin, setIsLogin] = useState(true)
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="w-full max-w-[420px] flex flex-col">
+          {/* Tab Switcher */}
+          <div className="flex w-full bg-gray-200 dark:bg-[#1f1c27] p-1 rounded-xl mb-8">
+            <button
+                onClick={() => setIsLogin(true)}
+                className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${isLogin ? "bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"}`}
+            >
+              Sign In
+            </button>
+            <button
+                onClick={() => setIsLogin(false)}
+                className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${!isLogin ? "bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"}`}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {/* Header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{isLogin ? "Welcome back" : "Create an account"}</h2>
+            <p className="text-gray-500 dark:text-[#a69db9]">{isLogin ? "Enter your details to access your dashboard." : "Join thousands of learners today."}</p>
+          </div>
+
+          {/* Form */}
+          <div className="flex flex-col gap-5">
             {/* Social Login Buttons */}
             <div className="grid grid-cols-2 gap-4">
               <button
@@ -38,7 +63,7 @@ function LoginForm() {
               <div className="flex-grow border-t border-gray-200 dark:border-[#433b54]"></div>
             </div>
 
-            {/* Inputs (Mock for Email/Password) */}
+            {/* Inputs (Mock for Email/Password - Functional logic omitted for simplicity as user asked for Google/Github) */}
             <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); }}>
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-slate-700 dark:text-gray-300" htmlFor="email">Email address</label>
@@ -68,16 +93,19 @@ function LoginForm() {
 
               {/* Submit Button */}
               <button className="w-full bg-primary hover:bg-purple-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-primary/25 transition-all transform active:scale-[0.98] mt-2 flex items-center justify-center gap-2 group" type="submit">
-                Sign In
+                {isLogin ? "Sign In" : "Sign Up"}
                 <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </button>
             </form>
 
             <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Don&apos;t have an account?
-              <Link className="font-bold text-primary hover:text-purple-400 transition-colors ml-1" href="#">Sign up for free</Link>
+              {isLogin ? "Don't have an account?" : "Already have an account?"}
+              <button onClick={() => setIsLogin(!isLogin)} className="font-bold text-primary hover:text-purple-400 transition-colors ml-1">
+                {isLogin ? "Sign up for free" : "Sign in"}
+              </button>
             </p>
           </div>
+    </div>
   )
 }
 
@@ -148,28 +176,9 @@ export default function Login() {
 
       {/* Right Panel: Authentication Form */}
       <div className="lg:w-1/2 w-full bg-background-light dark:bg-[#131118] flex items-center justify-center p-6 sm:p-12 relative">
-        <div className="w-full max-w-[420px] flex flex-col">
-          {/* Tab Switcher */}
-          <div className="flex w-full bg-gray-200 dark:bg-[#1f1c27] p-1 rounded-xl mb-8">
-            <button className="flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm transition-all">
-              Sign In
-            </button>
-            <button className="flex-1 py-2.5 text-sm font-semibold rounded-lg text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-all">
-              Sign Up
-            </button>
-          </div>
-
-          {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Welcome back</h2>
-            <p className="text-gray-500 dark:text-[#a69db9]">Enter your details to access your dashboard.</p>
-          </div>
-
-          {/* Form */}
-          <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>Loading...</div>}>
             <LoginForm />
-          </Suspense>
-        </div>
+        </Suspense>
 
         {/* Mobile footer links */}
         <div className="absolute bottom-6 left-0 w-full flex justify-center gap-6 text-xs text-gray-500 lg:hidden">
