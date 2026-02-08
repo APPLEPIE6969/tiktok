@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { explainConcept } from "@/lib/ai";
+import { chatWithTutor } from "@/lib/ai";
 import { auth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { query, context } = body;
+    const { query, subject, history } = body;
 
-    const explanation = await explainConcept(query, context);
+    const explanation = await chatWithTutor(query, subject || "General Knowledge", history || []);
 
     return NextResponse.json({ explanation });
   } catch (error) {

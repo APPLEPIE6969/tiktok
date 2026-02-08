@@ -1,14 +1,13 @@
 "use client"
 
 import { Sidebar } from "@/components/Sidebar"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Textarea } from "@/components/ui/Textarea"
 import { Select } from "@/components/ui/Select"
 import { saveQuiz } from "@/lib/quizStore"
 
 import { LANGUAGES } from "@/lib/constants"
-
 // Options for selects
 const difficultyOptions = [
   { value: "Beginner", label: "Beginner" },
@@ -53,6 +52,21 @@ export default function QuizGenerator() {
   const [showCustomContent, setShowCustomContent] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    // Load persisted language
+    const savedProfile = localStorage.getItem("studyflow_user_profile");
+    if (savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile);
+        if (profile.language) {
+          setLanguage(profile.language);
+        }
+      } catch (e) {
+        console.error("Failed to parse user profile", e);
+      }
+    }
+  }, []);
 
   const handleGenerate = async () => {
     if (!topic && !customContent) return;

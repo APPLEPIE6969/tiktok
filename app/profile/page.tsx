@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import { getUserProfile, saveUserProfile } from "@/lib/userStore"
 import { EmptyState } from "@/components/EmptyState"
 import { Select } from "@/components/ui/Select"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LANGUAGES } from "@/lib/constants"
 import { useRouter } from "next/navigation"
 
@@ -17,15 +17,28 @@ export default function Profile() {
 
   // State for tabs and settings
   const [activeTab, setActiveTab] = useState("overview")
-  const [language, setLanguage] = useState(userProfile?.language || "English")
+  const [language, setLanguage] = useState("English") // Initialize with default, update in useEffect
   const [darkMode, setDarkMode] = useState(true)
   const [emailNotifications, setEmailNotifications] = useState(true)
+
+  // Load profile data on client mount
+  useEffect(() => {
+    const profile = getUserProfile()
+    if (profile) {
+      if (profile.language) setLanguage(profile.language)
+      // Load other preferences if they existed in profile
+    }
+  }, [])
 
   // Update language in user profile when changed
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage)
-    if (userProfile && session?.user?.email) {
-      saveUserProfile({ ...userProfile, email: session.user.email, language: newLanguage })
+    if (session?.user?.email) {
+      // Save even if userProfile is null (will create new)
+      saveUserProfile({
+        email: session.user.email,
+        language: newLanguage
+      })
     }
   }
 

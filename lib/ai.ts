@@ -257,3 +257,47 @@ export async function transcribeAudio(audioBase64: string): Promise<string> {
   });
   return completion.text;
 }
+
+export async function chatWithTutor(message: string, subject: string, history: any[]): Promise<string> {
+  const systemPrompt = `You are an expert ${subject} tutor. Your goal is to help the user learn by explaining concepts clearly, asking guiding questions, and providing examples.
+  - Be encouraging and patient.
+  - If the user asks for a solution, guide them towards it rather than just giving the answer.
+  - Use simple language suitable for a student.
+  - Keep responses concise but helpful.`;
+
+  const messages = [
+    { role: "system", content: systemPrompt },
+    ...history.map(msg => ({ role: msg.role, content: msg.content })),
+    { role: "user", content: message }
+  ];
+
+  try {
+    const completion = await groq.chat.completions.create({
+      messages: messages as any,
+      model: TEXT_MODELS.LLAMA_70B.model,
+      temperature: 0.7,
+    });
+    return completion.choices[0]?.message?.content || "I'm having trouble thinking of a response right now.";
+  } catch (error) {
+    console.error("Groq chat failed, falling back:", error);
+    try {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: systemPrompt
+      });
+
+      const chat = model.startChat({
+        history: history.map(msg => ({
+          role: msg.role === "user" ? "user" : "model",
+          parts: [{ text: msg.content }],
+        })),
+      });
+
+      const result = await chat.sendMessage(message);
+      return result.response.text();
+    } catch (geminiError) {
+      console.error("Gemini chat failed:", geminiError);
+      return "Sorry, I'm unable to connect to my brain right now. Please try again later.";
+    }
+  }
+}
