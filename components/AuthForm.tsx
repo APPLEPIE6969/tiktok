@@ -41,7 +41,7 @@ export function AuthForm({ initialView = "login" }: { initialView?: "login" | "s
             <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => signIn("google", { callbackUrl })}
-                className="flex items-center justify-center gap-3 bg-white dark:bg-[#1f1c27] border border-gray-200 dark:border-[#433b54] hover:bg-gray-50 dark:hover:bg-[#2a2635] text-slate-700 dark:text-white py-3 px-4 rounded-xl transition-all font-medium text-sm group"
+                className="flex items-center justify-center gap-3 bg-white dark:bg-[#1f1c27] border border-gray-200 dark:border-[#433b54] hover:bg-gray-50 dark:hover:bg-[#2a2635] text-slate-700 dark:text-white py-3 px-4 rounded-xl transition-all font-medium text-sm group hover:shadow-md"
                 type="button"
               >
                 <Image alt="Google Logo" width={20} height={20} src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4UqHnsxUlLRTM3uM8G8z1bcj_rMUSU8tyQYPgQEBd0AI9qfWz2_YZv4aKuojT2k1mj2NOX0tznKM_mTH6Zc3zXdUqAspbhAGunfBWQbagOspg7ebQh_U_LmhEgJcin-xwIxWCc0lGQ8SYx_FWbzXJNFfsrDPZL3GW6fNSu9vj2NE9Ni1T4cQM6Qre581-YOBPhpDuaBwmFmatgJ5v3v1eEoj-bM0ead0EloKI4F334LSSqOe6G3rIHTtN5rzVNs63_MDrd00TrLnT"/>
@@ -49,7 +49,7 @@ export function AuthForm({ initialView = "login" }: { initialView?: "login" | "s
               </button>
               <button
                 onClick={() => signIn("github", { callbackUrl })}
-                className="flex items-center justify-center gap-3 bg-white dark:bg-[#1f1c27] border border-gray-200 dark:border-[#433b54] hover:bg-gray-50 dark:hover:bg-[#2a2635] text-slate-700 dark:text-white py-3 px-4 rounded-xl transition-all font-medium text-sm"
+                className="flex items-center justify-center gap-3 bg-white dark:bg-[#1f1c27] border border-gray-200 dark:border-[#433b54] hover:bg-gray-50 dark:hover:bg-[#2a2635] text-slate-700 dark:text-white py-3 px-4 rounded-xl transition-all font-medium text-sm hover:shadow-md"
                 type="button"
               >
                 <Image alt="GitHub Logo" className="dark:invert" width={20} height={20} src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9schCEOuNUhue2lHXVkeYKic9D53MXAIjHWwahQCG01tEz82xgtYH2UEzFkDqRtWQdq2JiRLx5L3vp7NxiVoFy1Nc07YhprEUIb6SpxMXnvE9OkFH1q8jytj3-EuaaZzf3A_JBtJlB6WUTLl1nVlmVQtXobUgwgX83mKPuOOWgv8IjALD_XK5Eb3Y7U2jyUID6C-UxO8HoFhJYFrO-iVhu3xCtxKaI_b6vIUCtQzWMhZuxxpB7tPYNfgOB2N6eowUK9UfpcCyvfY_" />

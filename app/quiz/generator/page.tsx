@@ -3,6 +3,7 @@
 import { Sidebar } from "@/components/Sidebar"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { Textarea } from "@/components/ui/Textarea"
 
 // Hardcoded for frontend simplicity, normally would import from shared config or API
 const AI_MODELS = {
@@ -147,13 +148,13 @@ export default function QuizGenerator() {
                 <div className="flex flex-col gap-2">
                     <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Topic or Content</label>
                     <div className="relative group">
-                        <textarea
-                            className="w-full h-40 bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl p-4 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-text-secondary focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none text-base"
+                        <Textarea
                             placeholder="e.g., Quantum Physics, The History of Rome, or paste a summary..."
                             value={topic}
                             onChange={(e) => setTopic(e.target.value)}
-                        ></textarea>
-                        <div className="absolute bottom-3 right-3 text-xs text-slate-400 dark:text-gray-600 font-medium bg-slate-50 dark:bg-[#131118] px-2 rounded">{topic.length}/2000</div>
+                            className="h-40"
+                        />
+                        <div className="absolute bottom-3 right-3 text-xs text-slate-400 dark:text-gray-600 font-medium bg-slate-50 dark:bg-[#1f1c27] px-2 rounded">{topic.length}/2000</div>
                     </div>
                 </div>
             ) : (

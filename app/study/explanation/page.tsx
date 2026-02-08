@@ -239,9 +239,9 @@ export default function SmartExplanation() {
                             <span className="material-symbols-outlined">chat_spark</span>
                         </div>
                         <div className="flex-1">
-                            <p className="text-sm text-white font-medium">Still confused? Ask for a different analogy.</p>
+                            <p className="text-sm text-white font-medium mb-1">Still confused? Ask for a different analogy.</p>
                             <input
-                                className="w-full bg-transparent border-none text-sm text-[#a69db9] placeholder-[#5f586b] focus:ring-0 px-0 py-1 focus:outline-none"
+                                className="w-full bg-[#131118]/50 rounded-lg border border-[#2e2839] text-sm text-white placeholder:text-[#5f586b] focus:ring-2 focus:ring-primary/50 focus:border-primary px-3 py-2 transition-all duration-200 focus:outline-none"
                                 placeholder="e.g., 'Explain using ocean waves analogy'..."
                                 type="text"
                                 value={query}
@@ -253,7 +253,7 @@ export default function SmartExplanation() {
                         <button
                             onClick={handleAsk}
                             disabled={loading}
-                            className="bg-[#2e2839] hover:bg-primary text-white p-2 rounded-lg transition-colors disabled:opacity-50"
+                            className="bg-[#2e2839] hover:bg-primary text-white p-2 rounded-lg transition-colors disabled:opacity-50 mt-5"
                         >
                             {loading ? <span className="material-symbols-outlined text-lg animate-spin">refresh</span> : <span className="material-symbols-outlined text-lg">send</span>}
                         </button>
