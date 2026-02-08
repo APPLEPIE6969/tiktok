@@ -7,6 +7,8 @@ import { getUserProfile } from "@/lib/userStore"
 import { useLanguage } from "@/lib/i18n"
 import { VoiceInput } from "@/components/VoiceInput"
 import { Select } from "@/components/ui/Select"
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 type Message = {
   role: 'user' | 'ai'
@@ -197,9 +199,26 @@ export default function SmartExplanation() {
                   )}
                   <div className={`p-4 rounded-2xl max-w-[85%] text-sm md:text-base leading-relaxed ${msg.role === 'user'
                     ? 'bg-primary text-white rounded-br-none'
-                    : 'bg-white dark:bg-[#1e182a] border border-slate-200 dark:border-surface-dark-lighter text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm'
+                    : 'bg-white dark:bg-[#1e182a] border border-slate-200 dark:border-surface-dark-lighter text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm prose dark:prose-invert max-w-none prose-sm sm:prose-base'
                     }`}>
-                    {msg.content}
+                    {msg.role === 'user' ? (
+                      msg.content
+                    ) : (
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          table: ({ node, ...props }) => <div className="overflow-x-auto my-4"><table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 border dark:border-slate-700" {...props} /></div>,
+                          th: ({ node, ...props }) => <th className="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 text-left text-xs font-semibold uppercase tracking-wider" {...props} />,
+                          td: ({ node, ...props }) => <td className="px-3 py-2 whitespace-nowrap border-t dark:border-slate-700" {...props} />,
+                          ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1 my-2" {...props} />,
+                          ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-1 my-2" {...props} />,
+                          code: ({ node, ...props }) => <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded font-mono text-sm" {...props} />,
+                          a: ({ node, ...props }) => <a className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    )}
                   </div>
                   {msg.role === 'user' && (
                     <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 mt-1">

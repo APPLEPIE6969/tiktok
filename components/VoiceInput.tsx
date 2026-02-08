@@ -11,11 +11,21 @@ interface VoiceInputProps {
 export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
     const [isRecording, setIsRecording] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [showPermissionPrompt, setShowPermissionPrompt] = useState(false)
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
     const chunksRef = useRef<Blob[]>([])
     const { t } = useLanguage()
 
+    const handleMicClick = () => {
+        if (isRecording) {
+            stopRecording()
+        } else {
+            setShowPermissionPrompt(true)
+        }
+    }
+
     const startRecording = async () => {
+        setShowPermissionPrompt(false)
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
             const mediaRecorder = new MediaRecorder(stream)
@@ -29,7 +39,7 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
             }
 
             mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' }) // Chrome/Firefox usually default to webm/opus
+                const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' })
                 setIsProcessing(true)
                 try {
                     await onAudioSend(audioBlob)
@@ -59,15 +69,43 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
     }
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative">
+            {/* Permission Prompt Pop-up */}
+            {showPermissionPrompt && (
+                <div className="absolute bottom-16 right-0 w-64 p-4 bg-white dark:bg-[#1e182a] border border-slate-200 dark:border-primary/30 rounded-2xl shadow-2xl animate-fade-in-up z-50">
+                    <div className="flex items-center gap-2 mb-2 text-primary">
+                        <span className="material-symbols-outlined text-xl">mic</span>
+                        <p className="font-bold text-sm">Microphone Access</p>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-text-secondary mb-3 leading-relaxed">
+                        StudyFlow needs access to your microphone to enable live audio chat with your AI Tutor.
+                    </p>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={startRecording}
+                            className="flex-1 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors"
+                        >
+                            Allow
+                        </button>
+                        <button
+                            onClick={() => setShowPermissionPrompt(false)}
+                            className="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-text-secondary text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                    <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white dark:bg-[#1e182a] border-r border-b border-slate-200 dark:border-primary/30 rotate-45"></div>
+                </div>
+            )}
+
             <button
-                onClick={isRecording ? stopRecording : startRecording}
+                onClick={handleMicClick}
                 disabled={disabled || isProcessing}
                 className={`p-3 rounded-full transition-all flex items-center justify-center shadow-lg ${isRecording
-                        ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                        : isProcessing
-                            ? "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                            : "bg-primary hover:bg-primary/90 text-white"
+                    ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
+                    : isProcessing
+                        ? "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+                        : "bg-primary hover:bg-primary/90 text-white"
                     }`}
                 title={isRecording ? t("tutor.stop") : t("tutor.voice_mode")}
             >
