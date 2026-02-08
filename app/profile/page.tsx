@@ -2,8 +2,22 @@
 
 import { Sidebar } from "@/components/Sidebar"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
+import { getUserProfile } from "@/lib/userStore"
 
 export default function Profile() {
+  const { data: session } = useSession()
+  const userProfile = getUserProfile()
+
+  // Combine session and stored profile data
+  const displayName = userProfile?.name || session?.user?.name || "Guest User"
+  const userImage = session?.user?.image || userProfile?.image
+  const userEmail = session?.user?.email || ""
+  const joinDate = userProfile?.createdAt
+    ? new Date(userProfile.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "New Member"
+  const stats = userProfile?.stats
+
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar />
@@ -19,7 +33,7 @@ export default function Profile() {
             <span className="text-lg font-bold text-slate-900 dark:text-white">LearnAI</span>
           </div>
           <div className="hidden flex-1 md:flex max-w-md">
-             {/* Empty spacer or search */}
+            {/* Empty spacer or search */}
           </div>
           <div className="flex items-center gap-3">
             <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-[#2e2839] dark:text-white dark:hover:bg-[#3a3347]">
@@ -29,7 +43,7 @@ export default function Profile() {
               <span className="material-symbols-outlined">dark_mode</span>
             </button>
             <div className="h-8 w-8 overflow-hidden rounded-full md:hidden">
-               <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
+              <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
             </div>
           </div>
         </header>
@@ -41,9 +55,15 @@ export default function Profile() {
               <div className="flex gap-6 items-center">
                 <div className="relative group cursor-pointer">
                   <div
-                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-24 w-24 md:h-32 md:w-32 ring-4 ring-slate-100 dark:ring-slate-800"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD7EgS_RZj3LHF3IHzip5AErl9X2ya6nJnJ0Gh8NDiYlGCCIivO7JdpWaNdFImjOg9t_WnX9r5xZyLo0WmD4eB_Jlp9uzZOXotFpWHY9-94EdxO_hwrkwpQ0Dx7jFdZEpOd5cYrAtFpehuEzEXZNCBh6Ki5wtquJXyv8aUJNkKCgWTjhwZEeLjj5nuldBIF-Av3juUcEH3SAH92Nqix6ijZ-wp08OrRn2Nybtd-lCoJXs06dNPmbQAGULqTOyAEIlKTsL67-6g1mqcE")' }}
-                  ></div>
+                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-24 w-24 md:h-32 md:w-32 ring-4 ring-slate-100 dark:ring-slate-800 overflow-hidden"
+                  >
+                    {userImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={userImage} alt={displayName} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400" />
+                    )}
+                  </div>
                   <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="material-symbols-outlined text-white">edit</span>
                   </div>
@@ -52,14 +72,11 @@ export default function Profile() {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="text-slate-900 dark:text-white text-3xl font-bold leading-tight">Alex Johnson</h1>
-                  <p className="text-slate-500 dark:text-text-secondary text-base mt-1">AI Learning Enthusiast | Pro Member</p>
+                  <h1 className="text-slate-900 dark:text-white text-3xl font-bold leading-tight">{displayName}</h1>
+                  <p className="text-slate-500 dark:text-text-secondary text-base mt-1">AI Learning Enthusiast | {userEmail}</p>
                   <div className="flex items-center gap-2 mt-2 text-sm text-slate-500 dark:text-text-secondary">
                     <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-                    <span>Joined Jan 2023</span>
-                    <span className="mx-1">•</span>
-                    <span className="material-symbols-outlined text-[18px]">location_on</span>
-                    <span>San Francisco, CA</span>
+                    <span>Joined {joinDate}</span>
                   </div>
                 </div>
               </div>
@@ -83,10 +100,9 @@ export default function Profile() {
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Total Quizzes</p>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <p className="text-slate-900 dark:text-white text-3xl font-bold">142</p>
-                  <span className="text-[#0bda6f] bg-[#0bda6f]/10 px-2 py-0.5 rounded text-xs font-bold">+12%</span>
+                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.totalQuizzes || 0}</p>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Top 5% of learners this week</p>
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Keep learning!</p>
               </div>
               <div className="flex flex-col gap-1 rounded-xl p-6 bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -94,10 +110,9 @@ export default function Profile() {
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Accuracy Score</p>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <p className="text-slate-900 dark:text-white text-3xl font-bold">88%</p>
-                  <span className="text-[#0bda6f] bg-[#0bda6f]/10 px-2 py-0.5 rounded text-xs font-bold">+2.5%</span>
+                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.accuracyScore || 0}%</p>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Consistent improvement in logic</p>
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Keep improving!</p>
               </div>
               <div className="flex flex-col gap-1 rounded-xl p-6 bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -105,10 +120,9 @@ export default function Profile() {
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Hours Studied</p>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <p className="text-slate-900 dark:text-white text-3xl font-bold">320h</p>
-                  <span className="text-[#0bda6f] bg-[#0bda6f]/10 px-2 py-0.5 rounded text-xs font-bold">+15h</span>
+                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.hoursStudied || 0}h</p>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Daily average: 1h 45m</p>
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Daily streak: {stats?.dailyStreak || 0} days</p>
               </div>
             </div>
 

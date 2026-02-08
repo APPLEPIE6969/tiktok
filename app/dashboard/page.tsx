@@ -2,8 +2,64 @@
 
 import { Sidebar } from "@/components/Sidebar"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { isOnboardingComplete, getUserProfile, type UserStats } from "@/lib/userStore"
+
+const defaultStats: UserStats = {
+  totalQuizzes: 0,
+  accuracyScore: 0,
+  hoursStudied: 0,
+  dailyStreak: 0,
+  currentLevel: 1,
+  xpEarned: 0,
+  xpToNextLevel: 100,
+}
 
 export default function Dashboard() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [userStats, setUserStats] = useState<UserStats>(defaultStats)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Check authentication and onboarding
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login")
+      return
+    }
+
+    if (status === "authenticated" && session?.user?.email) {
+      // Check if user has completed onboarding
+      if (!isOnboardingComplete(session.user.email)) {
+        router.push("/onboarding")
+        return
+      }
+
+      // Load user stats
+      const profile = getUserProfile()
+      if (profile?.stats) {
+        setUserStats(profile.stats)
+      }
+      setIsLoading(false)
+    }
+  }, [status, session, router])
+
+  // Get display name from session or profile
+  const displayName = session?.user?.name?.split(" ")[0] || "Learner"
+
+  if (status === "loading" || isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background-dark">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <p className="text-white/60">Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar />
@@ -37,7 +93,7 @@ export default function Dashboard() {
               <span className="material-symbols-outlined">dark_mode</span>
             </button>
             <div className="h-8 w-8 overflow-hidden rounded-full md:hidden">
-               <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
+              <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
             </div>
           </div>
         </header>
@@ -46,8 +102,8 @@ export default function Dashboard() {
           {/* Welcome Section + Stats */}
           <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex flex-col gap-2">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white lg:text-4xl">Welcome back, Alex! 👋</h2>
-              <p className="text-slate-500 dark:text-[#a69db9]">You&apos;ve learned for <span className="font-medium text-primary">45 minutes</span> today. Keep it up!</p>
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white lg:text-4xl">Welcome back, {displayName}! 👋</h2>
+              <p className="text-slate-500 dark:text-[#a69db9]">You&apos;ve learned for <span className="font-medium text-primary">{userStats.hoursStudied > 0 ? `${Math.round(userStats.hoursStudied * 60)} minutes` : "0 minutes"}</span> today. Keep it up!</p>
             </div>
 
             {/* Quick Stats Cards */}
@@ -59,7 +115,7 @@ export default function Dashboard() {
                   <span className="text-xs font-semibold uppercase tracking-wider">Daily Streak</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-slate-900 dark:text-white">12</span>
+                  <span className="text-2xl font-bold text-slate-900 dark:text-white">{userStats.dailyStreak}</span>
                   <span className="text-sm font-medium text-slate-500 dark:text-[#a69db9]">Days</span>
                 </div>
               </div>
@@ -71,12 +127,12 @@ export default function Dashboard() {
                     <span className="material-symbols-outlined text-primary">military_tech</span>
                     <span className="text-xs font-semibold uppercase tracking-wider">Current Level</span>
                   </div>
-                  <span className="text-xs font-bold text-primary">Lvl 5</span>
+                  <span className="text-xs font-bold text-primary">Lvl {userStats.currentLevel}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-[#a69db9]">
                     <span>XP Earned</span>
-                    <span>750 / 1000</span>
+                    <span>{userStats.xpEarned} / {userStats.xpToNextLevel}</span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-[#1a1622]">
                     <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-primary to-purple-400"></div>
@@ -144,8 +200,8 @@ export default function Dashboard() {
               {/* Card 1 */}
               <div className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 transition-all hover:shadow-md dark:bg-[#2e2839] dark:ring-white/10">
                 <div
-                    className="h-32 w-full bg-cover bg-center"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7MJmcdQVGMqFWiQXxx03oLDpPzr-uMxyeTBeh1eW3FK2bhtzuYo-Q6XHRP4hhY4sfNV_1CskhuqBdsMxtFgbuCF3QjID2O9sxE0XeFExUJeJiHXdGYhUf_ZBu_MaHvtmfbcwP65gUh-T1mx8JrkVHfHkhq7YC8EpLyYuRcNOqc6hO5BO82T_XxFnJlWa72zplbR_t2EtpXhW81D2SQEiWH2_VQGCXp6b3HXx2bkF6xBNBaEfUKOxBC67vku9jS49P-GDaCrI2pluR")' }}
+                  className="h-32 w-full bg-cover bg-center"
+                  style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7MJmcdQVGMqFWiQXxx03oLDpPzr-uMxyeTBeh1eW3FK2bhtzuYo-Q6XHRP4hhY4sfNV_1CskhuqBdsMxtFgbuCF3QjID2O9sxE0XeFExUJeJiHXdGYhUf_ZBu_MaHvtmfbcwP65gUh-T1mx8JrkVHfHkhq7YC8EpLyYuRcNOqc6hO5BO82T_XxFnJlWa72zplbR_t2EtpXhW81D2SQEiWH2_VQGCXp6b3HXx2bkF6xBNBaEfUKOxBC67vku9jS49P-GDaCrI2pluR")' }}
                 >
                   <div className="flex h-full w-full items-start justify-between bg-black/40 p-4 backdrop-blur-[2px]">
                     <span className="rounded-lg bg-black/60 px-2 py-1 text-xs font-bold text-white backdrop-blur-md">Math</span>
@@ -176,8 +232,8 @@ export default function Dashboard() {
               {/* Card 2 */}
               <div className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 transition-all hover:shadow-md dark:bg-[#2e2839] dark:ring-white/10">
                 <div
-                    className="h-32 w-full bg-cover bg-center"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBCKrk2aUT1-hjLxbh7_2MfX8leaIYPWGC0RxHbsYJnn-efTF8d6ADZ91S7q_Qe4QeAmgBjZq001q0egywi7wrflGS2F8vp_jaj6ChZ4-YGf5v0CXrME_Zvcq3OB84AxSn5yD4NNCKtiF4bkarovN3Zdyy4zwneKXaYMDd5l90EyNsFFXLTs3iGekqz3hG7t7HsZ8h6bD9oUC7y6iSF4EPbsL1APvs0QcwFzkbLmXGOwFvWJswWXmSGKwCTdvjYPgZsKyX08Zp6Tjsa")' }}
+                  className="h-32 w-full bg-cover bg-center"
+                  style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBCKrk2aUT1-hjLxbh7_2MfX8leaIYPWGC0RxHbsYJnn-efTF8d6ADZ91S7q_Qe4QeAmgBjZq001q0egywi7wrflGS2F8vp_jaj6ChZ4-YGf5v0CXrME_Zvcq3OB84AxSn5yD4NNCKtiF4bkarovN3Zdyy4zwneKXaYMDd5l90EyNsFFXLTs3iGekqz3hG7t7HsZ8h6bD9oUC7y6iSF4EPbsL1APvs0QcwFzkbLmXGOwFvWJswWXmSGKwCTdvjYPgZsKyX08Zp6Tjsa")' }}
                 >
                   <div className="flex h-full w-full items-start justify-between bg-black/40 p-4 backdrop-blur-[2px]">
                     <span className="rounded-lg bg-black/60 px-2 py-1 text-xs font-bold text-white backdrop-blur-md">Biology</span>
@@ -208,8 +264,8 @@ export default function Dashboard() {
               {/* Card 3 */}
               <div className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 transition-all hover:shadow-md dark:bg-[#2e2839] dark:ring-white/10">
                 <div
-                    className="h-32 w-full bg-cover bg-center"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBXvnjdkWIR8G3HJJ2_VJY11iggze4IvstrdNc4jaxdQJg9UKFId83ykkkekfJOOqi-dUcDXJLfdPTpfRc7sz7EC3zTipn-rNOYPxKeBp5iBR3u5Uu-odKTXAyPQtUgzesfwSZCwfL1-j3kHxV-TsklBf28uo_YSIJtSBxp85GRYy73VR0lirTN7uGuQR-LF47jaWADkwNX1lho554M3Qhd7nPHiFY3PO-zEZyef26IZXFrExyGij2_ofuFHLLaCzPRnZQK9EB9dm6b")' }}
+                  className="h-32 w-full bg-cover bg-center"
+                  style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBXvnjdkWIR8G3HJJ2_VJY11iggze4IvstrdNc4jaxdQJg9UKFId83ykkkekfJOOqi-dUcDXJLfdPTpfRc7sz7EC3zTipn-rNOYPxKeBp5iBR3u5Uu-odKTXAyPQtUgzesfwSZCwfL1-j3kHxV-TsklBf28uo_YSIJtSBxp85GRYy73VR0lirTN7uGuQR-LF47jaWADkwNX1lho554M3Qhd7nPHiFY3PO-zEZyef26IZXFrExyGij2_ofuFHLLaCzPRnZQK9EB9dm6b")' }}
                 >
                   <div className="flex h-full w-full items-start justify-between bg-black/40 p-4 backdrop-blur-[2px]">
                     <span className="rounded-lg bg-black/60 px-2 py-1 text-xs font-bold text-white backdrop-blur-md">CS 101</span>
@@ -309,7 +365,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="mt-2 flex items-center justify-center rounded-xl bg-slate-50 p-3 text-center text-xs font-medium text-slate-500 dark:bg-[#1a1622] dark:text-[#a69db9]">
-                    No other events this week
+                  No other events this week
                 </div>
               </div>
             </div>
