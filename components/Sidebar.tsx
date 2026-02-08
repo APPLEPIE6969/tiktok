@@ -6,10 +6,10 @@ import { useSession } from "next-auth/react"
 
 const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: "dashboard" },
-  { name: "My Courses", href: "#", icon: "menu_book" },
+  { name: "My Courses", href: "/courses", icon: "menu_book" },
   { name: "Quizzes", href: "/quiz/generator", icon: "quiz" },
   { name: "AI Tutor", href: "/study/explanation", icon: "psychology" },
-  { name: "Resources", href: "#", icon: "folder_open" },
+  { name: "Resources", href: "/resources", icon: "folder_open" },
 ]
 
 const settingsItems = [

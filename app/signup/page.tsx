@@ -4,7 +4,7 @@ import Link from "next/link"
 import { AuthForm } from "@/components/AuthForm"
 import { Suspense } from "react"
 
-export default function Login() {
+export default function Signup() {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen w-full overflow-hidden">
       {/* Left Panel: Visual & Testimonial */}
@@ -72,7 +72,7 @@ export default function Login() {
       {/* Right Panel: Authentication Form */}
       <div className="lg:w-1/2 w-full bg-background-light dark:bg-[#131118] flex items-center justify-center p-6 sm:p-12 relative">
         <Suspense fallback={<div>Loading...</div>}>
-            <AuthForm initialView="login" />
+            <AuthForm initialView="signup" />
         </Suspense>
 
         {/* Mobile footer links */}

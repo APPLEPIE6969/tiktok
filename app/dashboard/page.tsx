@@ -112,7 +112,7 @@ export default function Dashboard() {
                 </div>
               </Link>
 
-              <button className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-2xl bg-[#2e2839] p-6 text-white ring-1 ring-white/10 transition-all hover:bg-[#3a3347] hover:shadow-lg">
+              <Link href="/create" className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-2xl bg-[#2e2839] p-6 text-white ring-1 ring-white/10 transition-all hover:bg-[#3a3347] hover:shadow-lg">
                 <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 transition-transform group-hover:scale-110">
                   <span className="material-symbols-outlined text-3xl">add_notes</span>
                 </div>
@@ -120,9 +120,9 @@ export default function Dashboard() {
                   <span className="block text-lg font-bold">New Note</span>
                   <span className="text-sm text-[#a69db9]">Start a fresh page for your lecture or study session.</span>
                 </div>
-              </button>
+              </Link>
 
-              <button className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-2xl bg-[#2e2839] p-6 text-white ring-1 ring-white/10 transition-all hover:bg-[#3a3347] hover:shadow-lg">
+              <Link href="/profile" className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-2xl bg-[#2e2839] p-6 text-white ring-1 ring-white/10 transition-all hover:bg-[#3a3347] hover:shadow-lg">
                 <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 transition-transform group-hover:scale-110">
                   <span className="material-symbols-outlined text-3xl">history</span>
                 </div>
@@ -130,7 +130,7 @@ export default function Dashboard() {
                   <span className="block text-lg font-bold">Review History</span>
                   <span className="text-sm text-[#a69db9]">Look back at what you covered yesterday.</span>
                 </div>
-              </button>
+              </Link>
             </div>
           </section>
 
@@ -138,7 +138,7 @@ export default function Dashboard() {
           <section>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Recommended for You</h3>
-              <Link className="text-sm font-medium text-primary hover:text-primary/80" href="#">View all</Link>
+              <Link className="text-sm font-medium text-primary hover:text-primary/80" href="/courses">View all</Link>
             </div>
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {/* Card 1 */}
@@ -323,7 +323,7 @@ export default function Dashboard() {
           <span className="material-symbols-outlined fill text-xl">dashboard</span>
           <span className="text-[10px] font-medium">Home</span>
         </Link>
-        <Link className="flex flex-col items-center gap-1 text-slate-500 dark:text-[#a69db9]" href="#">
+        <Link className="flex flex-col items-center gap-1 text-slate-500 dark:text-[#a69db9]" href="/courses">
           <span className="material-symbols-outlined text-xl">menu_book</span>
           <span className="text-[10px] font-medium">Courses</span>
         </Link>

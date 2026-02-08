@@ -37,7 +37,7 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <Link href="/login" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base md:text-lg font-bold shadow-xl shadow-primary/25 transition-all hover:-translate-y-1">
+              <Link href="/signup" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base md:text-lg font-bold shadow-xl shadow-primary/25 transition-all hover:-translate-y-1">
                 <span className="mr-2">Get Started for Free</span>
                 <span className="material-symbols-outlined">rocket_launch</span>
               </Link>
@@ -182,7 +182,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">Ready to start your journey?</h2>
             <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">Join thousands of learners mastering new skills every day with Lumina AI. No credit card required to start.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/login" className="flex h-12 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base font-bold transition-all hover:shadow-lg hover:shadow-primary/40">
+              <Link href="/signup" className="flex h-12 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base font-bold transition-all hover:shadow-lg hover:shadow-primary/40">
                   Get Started for Free
               </Link>
               <button className="flex h-12 px-8 items-center justify-center rounded-xl bg-transparent border border-slate-600 hover:border-white text-white text-base font-bold transition-all">
