@@ -98,8 +98,9 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
       // Record activity for streak
       recordActivity();
 
-      // Calculate XP Reward: 50 base + 10 per correct answer
-      const xpReward = 50 + (score * 10);
+      // Calculate XP Reward: (Correct * 20) + (Incorrect * 5) + 10 bonus
+      const incorrectCount = quizQuestions.length - score;
+      const xpReward = (score * 20) + (incorrectCount * 5) + 10;
       addXP(xpReward);
 
       // Update total quizzes and accuracy in global stats
@@ -115,8 +116,8 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
           accuracyScore: newAccuracy
         });
       }
+      router.push(`/quiz/${id}/results?score=${score}&total=${quizQuestions.length}&xp=${xpReward}`);
     }
-    router.push(`/quiz/${id}/results?score=${score}&total=${quizQuestions.length}`);
   };
 
 

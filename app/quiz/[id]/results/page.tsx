@@ -11,11 +11,13 @@ export default function QuizResults({ params }: { params: Promise<{ id: string }
     const searchParams = useSearchParams()
     const scoreParam = searchParams.get("score")
     const totalParam = searchParams.get("total")
+    const xpParam = searchParams.get("xp")
 
     const [quiz, setQuiz] = useState<SavedQuiz | null>(null)
 
     const score = parseInt(scoreParam || "0")
     const total = parseInt(totalParam || "1")
+    const xp = parseInt(xpParam || "0")
     const percentage = Math.round((score / total) * 100)
 
     useEffect(() => {
@@ -80,14 +82,21 @@ export default function QuizResults({ params }: { params: Promise<{ id: string }
                     </div>
 
                     {/* Score Details */}
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-slate-50 dark:bg-[#1a1622] rounded-xl p-4">
+                    <div className="grid grid-cols-3 gap-3 mb-8">
+                        <div className="bg-slate-50 dark:bg-[#1a1622] rounded-xl p-4 transition-all hover:scale-105">
                             <p className="text-2xl font-bold text-green-500">{score}</p>
-                            <p className="text-xs text-slate-500 dark:text-[#a69db9] uppercase tracking-wider">Correct</p>
+                            <p className="text-[10px] text-slate-500 dark:text-[#a69db9] uppercase font-bold tracking-wider">Correct</p>
                         </div>
-                        <div className="bg-slate-50 dark:bg-[#1a1622] rounded-xl p-4">
+                        <div className="bg-slate-50 dark:bg-[#1a1622] rounded-xl p-4 transition-all hover:scale-105">
                             <p className="text-2xl font-bold text-red-500">{total - score}</p>
-                            <p className="text-xs text-slate-500 dark:text-[#a69db9] uppercase tracking-wider">Incorrect</p>
+                            <p className="text-[10px] text-slate-500 dark:text-[#a69db9] uppercase font-bold tracking-wider">Incorrect</p>
+                        </div>
+                        <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/20 transition-all hover:scale-105 shadow-lg shadow-primary/5">
+                            <div className="flex items-center justify-center gap-1">
+                                <span className="material-symbols-outlined text-primary text-sm">stars</span>
+                                <p className="text-2xl font-bold text-primary">{xp}</p>
+                            </div>
+                            <p className="text-[10px] text-primary dark:text-primary uppercase font-black tracking-wider">XP Earned</p>
                         </div>
                     </div>
 
