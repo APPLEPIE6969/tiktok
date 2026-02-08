@@ -21,65 +21,107 @@ export async function POST(req: NextRequest) {
         const base64Audio = Buffer.from(arrayBuffer).toString("base64");
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-        // Using the specific model requested
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash-preview-native-audio-dialog",
-        });
 
-        // Construct the prompt
-        // We can add a system instruction or just prepend it to the history
-        const systemPrompt = `You are a helpful and friendly AI Tutor. 
-    You are speaking with a student in ${language}. 
-    Keep your responses concise, encouraging, and focused on helping them learn. 
-    Do not be too verbose as this is a voice conversation.`;
+        // 1. Try Native Audio Model
+        try {
+            const model = genAI.getGenerativeModel({
+                model: "gemini-2.5-flash-preview-native-audio-dialog",
+            });
 
-        const chat = model.startChat({
-            history: [
+            const systemPrompt = `You are a helpful and friendly AI Tutor. 
+      You are speaking with a student in ${language}. 
+      Keep your responses concise, encouraging, and focused on helping them learn. 
+      Do not be too verbose as this is a voice conversation.`;
+
+            const chat = model.startChat({
+                history: [
+                    {
+                        role: "user",
+                        parts: [{ text: systemPrompt }],
+                    },
+                    ...history.map((msg: any) => ({
+                        role: msg.role === "ai" ? "model" : "user",
+                        parts: [{ text: msg.content }],
+                    })),
+                ],
+            });
+
+            const result = await chat.sendMessage([
                 {
-                    role: "user",
-                    parts: [{ text: systemPrompt }],
+                    inlineData: {
+                        mimeType: audioFile.type || "audio/webm",
+                        data: base64Audio,
+                    },
                 },
-                ...history.map((msg: any) => ({
-                    role: msg.role === "ai" ? "model" : "user",
-                    parts: [{ text: msg.content }],
-                })),
-            ],
-        });
+            ]);
 
-        const result = await chat.sendMessage([
-            {
-                inlineData: {
-                    mimeType: audioFile.type || "audio/webm",
-                    data: base64Audio,
-                },
-            },
-        ]);
+            const response = await result.response;
+            const candidates = response.candidates;
+            let text = "";
+            let audioData = null;
 
-        const response = await result.response;
-        const candidates = response.candidates;
-        let text = "";
-        let audioData = null;
-
-        if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
-            for (const part of candidates[0].content.parts) {
-                if (part.text) {
-                    text += part.text;
-                }
-                if (part.inlineData && part.inlineData.mimeType.startsWith("audio/")) {
-                    audioData = part.inlineData.data;
+            if (candidates && candidates[0] && candidates[0].content && candidates[0].content.parts) {
+                for (const part of candidates[0].content.parts) {
+                    if (part.text) {
+                        text += part.text;
+                    }
+                    if (part.inlineData && part.inlineData.mimeType.startsWith("audio/")) {
+                        audioData = part.inlineData.data;
+                    }
                 }
             }
-        }
 
-        if (!text && !audioData) {
-            // Fallback if structure is different or empty
-            text = response.text();
-        }
+            if (!text && !audioData) {
+                text = response.text();
+            }
 
-        return NextResponse.json({
-            text,
-            audio: audioData
-        });
+            return NextResponse.json({
+                text,
+                audio: audioData
+            });
+
+        } catch (nativeError) {
+            console.warn("Native Audio API failed, falling back to text-to-speech chain:", nativeError);
+
+            // 2. Fallback: Transcribe Audio -> Text Chat -> Return Text (Frontend will use TTS if needed or just show text)
+            // For now, we don't have a robust server-side STT + TTS chain ready in this route without importing more libs.
+            // But we CAN use the `generateTutorResponse` for the text part if we could transcribe.
+
+            // Since we can't easily transcribe without Whisper (Groq) here (and we want to keep it simple),
+            // we might just return an error OR try to transcribe if we import `transcribeAudio` from lib/ai.
+
+            // Let's try to transcribe using Groq (since we have the key) and then chat.
+            try {
+                const { transcribeAudio } = await import("@/lib/ai");
+                const { generateTutorResponse } = await import("@/lib/chat");
+
+                // Transcribe
+                const transcription = await transcribeAudio(base64Audio); // Note: transcribeAudio expects base64 string? lib/ai says it takes base64.
+
+                if (!transcription) throw new Error("Transcription failed");
+
+                // Chat
+                const chatResponse = await generateTutorResponse(
+                    transcription,
+                    history,
+                    "General Tutor", // Default subject for voice
+                    language
+                );
+
+                return NextResponse.json({
+                    text: chatResponse.text,
+                    audio: null, // Frontend will handle text-only response (maybe Read Aloud?)
+                    model: chatResponse.model + " (fallback)"
+                });
+
+            } catch (fallbackError) {
+                console.error("Fallback chain failed:", fallbackError);
+                return NextResponse.json({
+                    error: "Failed to process audio",
+                    details: "Both native audio and fallback chains failed."
+                }, { status: 500 });
+            }
+        }
 
     } catch (error) {
         console.error("Error in live tutor API:", error);

@@ -10,7 +10,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy_key" });
 // =============================================================================
 
 // All available text generation models for quiz generation
-const TEXT_MODELS = {
+export const TEXT_MODELS = {
   // Gemini Models (ordered by capability)
   GEMINI_FLASH_25: { provider: "gemini" as const, model: "gemini-2.5-flash" },
   GEMINI_FLASH_3: { provider: "gemini" as const, model: "gemini-3-flash-preview" },
@@ -109,11 +109,11 @@ const FALLBACK_CHAINS: Record<AIMode, ModelEntry[]> = {
 
   // Fast: Start with fastest, minimal fallbacks
   fast: [
+    TEXT_MODELS.GEMINI_FLASH_LITE,
     TEXT_MODELS.LLAMA_8B,
     TEXT_MODELS.COMPOUND_MINI,
     TEXT_MODELS.GEMMA_4B,
     TEXT_MODELS.GEMMA_1B,
-    TEXT_MODELS.GEMINI_FLASH_LITE,
   ],
 };
 
@@ -146,11 +146,16 @@ function buildQuizPrompt(params: QuizGenerationParams): string {
     ? `\n\nIMPORTANT: Use ONLY the following source material to generate questions. Do not use any external knowledge:\n---\n${params.customContent}\n---\n`
     : "";
 
-  return `Generate a quiz about "${params.topic}".${customContentSection}
+  return `You are an expert tutor. Generate a high-quality, factually accurate quiz about "${params.topic}".${customContentSection}
 Difficulty: ${params.difficulty}.
 Question Type: ${params.type}.
 Number of Questions: ${questionCount}.
 Language: Generate all questions, options, and explanations in ${params.language}.
+
+CRITICAL INSTRUCTIONS:
+1. Ensure all answers are FACTUALLY CORRECT.
+2. The "correctAnswer" MUST be exactly identical to one of the strings in the "options" array.
+3. Provide a clear, educational explanation for why the answer is correct.
 
 Output strictly valid JSON in the following format:
 [

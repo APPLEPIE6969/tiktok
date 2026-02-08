@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/Sidebar"
 import { getUserProfile } from "@/lib/userStore"
 import { useLanguage } from "@/lib/i18n"
 import { VoiceInput } from "@/components/VoiceInput"
+import { Select } from "@/components/ui/Select"
 
 type Message = {
   role: 'user' | 'ai'
@@ -141,17 +142,14 @@ export default function SmartExplanation() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t("nav.tutor")}</h1>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs text-slate-500 dark:text-text-secondary">Subject:</span>
-                <select
+                <Select
+                  options={SUBJECTS.map(s => ({ value: s.id, label: s.name }))}
                   value={selectedSubject.id}
-                  onChange={(e) => setSelectedSubject(SUBJECTS.find(s => s.id === e.target.value) || SUBJECTS[0])}
-                  className="bg-transparent text-xs font-medium text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
-                >
-                  {SUBJECTS.map(subject => (
-                    <option key={subject.id} value={subject.id}>{subject.name}</option>
-                  ))}
-                </select>
+                  onChange={(val) => setSelectedSubject(SUBJECTS.find(s => s.id === val) || SUBJECTS[0])}
+                  className="w-48"
+                />
               </div>
             </div>
           </div>

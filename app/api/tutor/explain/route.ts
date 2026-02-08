@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { chatWithTutor } from "@/lib/ai";
+import { generateTutorResponse } from "@/lib/chat";
 import { auth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -10,11 +10,23 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { query, subject, history } = body;
+    const { query, subject, history, language } = body;
 
-    const explanation = await chatWithTutor(query, subject || "General Knowledge", history || []);
+    // Convert frontend history to ChatMessage format if needed, 
+    // but generateTutorResponse expects standard role/content objects which match.
+    // We just need to ensure the types align.
 
-    return NextResponse.json({ explanation });
+    // Default language to English if not provided (though frontend sends it now)
+    const userLanguage = language || "English";
+
+    const response = await generateTutorResponse(
+      query,
+      history || [],
+      subject || "General Knowledge",
+      userLanguage
+    );
+
+    return NextResponse.json({ explanation: response.text, model: response.model });
   } catch (error) {
     console.error("Explanation API Error:", error);
     return NextResponse.json({ error: "Failed to generate explanation" }, { status: 500 });

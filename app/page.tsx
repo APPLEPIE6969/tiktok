@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Navbar } from "@/components/Navbar"
@@ -14,7 +15,7 @@ export default function Home() {
 
       <Navbar />
 
-      <main className="relative z-10 flex-grow flex flex-col">
+      <main className="relative z-10 grow flex flex-col">
         {/* Hero Section */}
         <section className="relative pt-16 pb-20 px-4 md:pt-24 md:pb-32 lg:px-10">
           <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
@@ -37,11 +38,11 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <Link href="/signup" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base md:text-lg font-bold shadow-xl shadow-primary/25 transition-all hover:-translate-y-1">
+              <Link href="/dashboard" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base md:text-lg font-bold shadow-xl shadow-primary/25 transition-all hover:-translate-y-1">
                 <span className="mr-2">Get Started for Free</span>
                 <span className="material-symbols-outlined">rocket_launch</span>
               </Link>
-              <Link href="#" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-slate-700 hover:border-primary/50 text-slate-900 dark:text-white text-base md:text-lg font-bold transition-all hover:-translate-y-1">
+              <Link href="/dashboard" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-slate-700 hover:border-primary/50 text-slate-900 dark:text-white text-base md:text-lg font-bold transition-all hover:-translate-y-1">
                 <span className="mr-2">View Demo</span>
                 <span className="material-symbols-outlined">play_circle</span>
               </Link>
@@ -49,14 +50,14 @@ export default function Home() {
 
             {/* Hero Visual / Dashboard Preview */}
             <div className="mt-16 w-full max-w-5xl relative group perspective-1000">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary via-blue-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              <div className="absolute -inset-1 bg-linear-to-r from-primary via-blue-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
               <div className="relative rounded-2xl bg-slate-900/50 backdrop-blur-xl border border-slate-700 overflow-hidden shadow-2xl">
                 {/* Placeholder for dashboard UI */}
                 <div
-                  className="aspect-[16/9] w-full bg-cover bg-center"
+                  className="aspect-video w-full bg-cover bg-center"
                   style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYrTC_3JvqGtb_LxgrczRTuj440FbxKWOFH-xHbbJY301YA_IFg-jEALOvMRyJh_H5O9H3FOo1k2aYfFbC6mM5riTHESh_PJKOjZBAkNBHb6XoeyFyj4YEbbyANJqdduY_CunKKBwo9puQDxWFmwV-RV4sRH8Stounzg6201o4SEScYYbk17_7MfBPHFVTPbR7MhhB64GaDn50GVSl2SL686xzaaJabrrRna1NvC_YyMDkEVhkPO5uJRK5IlXWia3fiTKD8BELF7qd")' }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-80"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-background-dark via-transparent to-transparent opacity-80"></div>
                   <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 text-left">
                     <div className="glass-panel inline-block p-4 rounded-xl max-w-md animate-pulse">
                       <div className="flex items-center gap-3 mb-2">
@@ -106,8 +107,8 @@ export default function Home() {
                 <div className="mt-auto pt-4">
                   <div className="h-32 w-full rounded-lg overflow-hidden relative">
                     <div
-                        className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBxFSzE2nTtGJ730180oXuUc2V5Br5CbCF3NPhB6a_Qk0vDQws5JzCJGtFUIQJuTr-wjhy48EzcY_EXsdB0zU7yDznBsNKHbkCawUR9dPXkpIl9JA88W15hnrarLxgUBXie1kmZ3y1HVLb6M1FGUaunVezsNH_uvyZr549GZYsT0aJxiN2s7C1VNC8u_r5xKwIfj_w0Hh5gJQPqhkq_8s5hgWNFNViQIbOySbxuO7Arlw4csKjCGFRN2mueiE_jCMV4ZIMYC6f2XTwr")' }}
+                      className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
+                      style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBxFSzE2nTtGJ730180oXuUc2V5Br5CbCF3NPhB6a_Qk0vDQws5JzCJGtFUIQJuTr-wjhy48EzcY_EXsdB0zU7yDznBsNKHbkCawUR9dPXkpIl9JA88W15hnrarLxgUBXie1kmZ3y1HVLb6M1FGUaunVezsNH_uvyZr549GZYsT0aJxiN2s7C1VNC8u_r5xKwIfj_w0Hh5gJQPqhkq_8s5hgWNFNViQIbOySbxuO7Arlw4csKjCGFRN2mueiE_jCMV4ZIMYC6f2XTwr")' }}
                     ></div>
                   </div>
                 </div>
@@ -125,8 +126,8 @@ export default function Home() {
                 <div className="mt-auto pt-4">
                   <div className="h-32 w-full rounded-lg overflow-hidden relative">
                     <div
-                        className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmfraApMO97qaqBmwZ-wMMk8DuRXD64PAWmFtAvY-7veAW9WKvdkNMn1_UAx5zVuwwMipD3OnGErcvupDV4fepWh5MFtIlnQgNtFrq7t0XMsje37YydKWzeagdbEDgOMn9iibhFoWyJgieo__G7p9UPzR2QadeNgUTfSNWEYp0Hx6dt5qumU20ngqOigzHbjs0PaRvKrB9t1CKUk8cu1NqBgBkEADI-nX8AIz9rAMiKSoUaJSnCZQEweG2sBSVaPk-YlK3teJ_qDaW")' }}
+                      className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
+                      style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmfraApMO97qaqBmwZ-wMMk8DuRXD64PAWmFtAvY-7veAW9WKvdkNMn1_UAx5zVuwwMipD3OnGErcvupDV4fepWh5MFtIlnQgNtFrq7t0XMsje37YydKWzeagdbEDgOMn9iibhFoWyJgieo__G7p9UPzR2QadeNgUTfSNWEYp0Hx6dt5qumU20ngqOigzHbjs0PaRvKrB9t1CKUk8cu1NqBgBkEADI-nX8AIz9rAMiKSoUaJSnCZQEweG2sBSVaPk-YlK3teJ_qDaW")' }}
                     ></div>
                   </div>
                 </div>
@@ -144,8 +145,8 @@ export default function Home() {
                 <div className="mt-auto pt-4">
                   <div className="h-32 w-full rounded-lg overflow-hidden relative">
                     <div
-                        className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAGG7s5jNHsosjGbg88EyEE4ncQuQY4uYnG72vmupQHVSkp9mlhGhwmyJUHnjhq1sT3zyxluZOOltNzxJQVrYWTYZGGyltlpXQXdLap3wl4qhdinClR94E4oPhgmeBCIc1nf4_oApykw2FzJMJR0G9nbxp_Fdph2H5FaWaJCGvdzYM9tJJH1wXNDMPYHBPHOkcrhmKg9MM5J98EqGtfHFchXWOd54uhk6283TyydmB16d5JFIOWjo68jTXYr3k-mchmmrCx_CJPRgam")' }}
+                      className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
+                      style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAGG7s5jNHsosjGbg88EyEE4ncQuQY4uYnG72vmupQHVSkp9mlhGhwmyJUHnjhq1sT3zyxluZOOltNzxJQVrYWTYZGGyltlpXQXdLap3wl4qhdinClR94E4oPhgmeBCIc1nf4_oApykw2FzJMJR0G9nbxp_Fdph2H5FaWaJCGvdzYM9tJJH1wXNDMPYHBPHOkcrhmKg9MM5J98EqGtfHFchXWOd54uhk6283TyydmB16d5JFIOWjo68jTXYr3k-mchmmrCx_CJPRgam")' }}
                     ></div>
                   </div>
                 </div>
@@ -158,15 +159,15 @@ export default function Home() {
         <section className="w-full py-10 px-4">
           <div className="max-w-7xl mx-auto rounded-3xl overflow-hidden relative h-[400px] md:h-[500px] flex items-center justify-center">
             <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKEAbkPcl7yGQeHiCM3tUrtcdrW0zK71fPVkOcMjNE8kUyLsHbb43NrJtC7eTK9jV0Ou34zEr1hisHv9p43m2kBwBy-pbj3RuJ6acnChaPxcDiWOJED0OKd1azdQ8uYPRe1zlTQ-UUT8WXTMMII5LeCcN6kOQlDH-kPuoMROffTmqxMCBVjFHPcWQSDYyXTgubPhNwd0GkweyGIC0MFGsdmhDwf7IpCX_ft7iAbS6-GnV_t_J1bpbCb5H2BPGrVd9JXVisqG22Fm6r")' }}
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKEAbkPcl7yGQeHiCM3tUrtcdrW0zK71fPVkOcMjNE8kUyLsHbb43NrJtC7eTK9jV0Ou34zEr1hisHv9p43m2kBwBy-pbj3RuJ6acnChaPxcDiWOJED0OKd1azdQ8uYPRe1zlTQ-UUT8WXTMMII5LeCcN6kOQlDH-kPuoMROffTmqxMCBVjFHPcWQSDYyXTgubPhNwd0GkweyGIC0MFGsdmhDwf7IpCX_ft7iAbS6-GnV_t_J1bpbCb5H2BPGrVd9JXVisqG22Fm6r")' }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-background-dark/90 to-background-dark/40"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-background-dark/90 to-background-dark/40"></div>
             <div className="relative z-10 max-w-2xl text-center md:text-left md:mr-auto md:ml-20 px-6">
               <h2 className="text-3xl md:text-5xl font-black text-white mb-6">Learning is better together.</h2>
               <p className="text-lg text-slate-300 mb-8">Share your AI-generated quizzes with friends, challenge them to beat your score, and learn collaboratively.</p>
               <button className="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors">
-                  Explore Community Features
+                Explore Community Features
               </button>
             </div>
           </div>
@@ -183,10 +184,10 @@ export default function Home() {
             <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">Join thousands of learners mastering new skills every day with Lumina AI. No credit card required to start.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/signup" className="flex h-12 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base font-bold transition-all hover:shadow-lg hover:shadow-primary/40">
-                  Get Started for Free
+                Get Started for Free
               </Link>
               <button className="flex h-12 px-8 items-center justify-center rounded-xl bg-transparent border border-slate-600 hover:border-white text-white text-base font-bold transition-all">
-                  View Pricing
+                View Pricing
               </button>
             </div>
             <p className="mt-6 text-sm text-slate-500">Free 14-day trial on Pro plans. Cancel anytime.</p>
@@ -195,7 +196,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#131118] border-t border-[#2e2839] py-12 px-4 md:px-10 text-slate-400 text-sm">
+      <footer className="bg-[#131118] border-t border-surface-dark-lighter py-12 px-4 md:px-10 text-slate-400 text-sm">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">auto_awesome</span>
@@ -208,7 +209,7 @@ export default function Home() {
             <a className="hover:text-primary transition-colors" href="#">Twitter</a>
           </div>
           <div>
-              © 2023 StudyFlow Inc.
+            © 2023 StudyFlow Inc.
           </div>
         </div>
       </footer>

@@ -12,15 +12,17 @@ import { useRouter } from "next/navigation"
 
 import { useLanguage } from "@/lib/i18n"
 
+import { useTheme } from "@/components/ThemeProvider"
+
 export default function Profile() {
   const { data: session } = useSession()
   const router = useRouter()
   const userProfile = getUserProfile()
   const { language, setLanguage, t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
 
   // State for tabs and settings
   const [activeTab, setActiveTab] = useState("overview")
-  const [darkMode, setDarkMode] = useState(true)
   const [emailNotifications, setEmailNotifications] = useState(true)
 
   // Update language in user profile when changed
@@ -55,39 +57,39 @@ export default function Profile() {
           <div className="space-y-8 animate-fade-in">
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-1">
+              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-1">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl text-primary">quiz</span>
                 </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Total Quizzes</p>
+                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Total Quizzes</p>
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.totalQuizzes || 0}</p>
                 </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
                   {(stats?.totalQuizzes || 0) === 0 ? "Take your first quiz!" : "Keep learning!"}
                 </p>
               </div>
-              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-2">
+              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-2">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl text-primary">target</span>
                 </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Accuracy Score</p>
+                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Accuracy Score</p>
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.accuracyScore || 0}%</p>
                 </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
                   {(stats?.accuracyScore || 0) === 0 ? "Complete quizzes to track accuracy" : "Keep improving!"}
                 </p>
               </div>
-              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-3">
+              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-3">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl text-primary">schedule</span>
                 </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Hours Studied</p>
+                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Hours Studied</p>
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.hoursStudied || 0}h</p>
                 </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">Daily streak: {stats?.dailyStreak || 0} days</p>
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Daily streak: {stats?.dailyStreak || 0} days</p>
               </div>
             </div>
 
@@ -105,7 +107,7 @@ export default function Profile() {
                   {/* Content would be rendered here when user has data */}
                 </div>
               ) : (
-                <div className="rounded-2xl bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347]">
+                <div className="rounded-2xl bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50">
                   <EmptyState
                     icon="school"
                     title="Nothing to continue"
@@ -121,17 +123,17 @@ export default function Profile() {
       case "settings":
         return (
           <div className="space-y-8 animate-fade-in">
-            <section className="bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] rounded-2xl p-6">
+            <section className="bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl p-6">
               <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-6">{t("profile.preferences")}</h3>
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-text-secondary">
                       <span className="material-symbols-outlined">dark_mode</span>
                     </div>
                     <div>
                       <p className="text-slate-900 dark:text-white font-medium">{t("profile.theme")}</p>
-                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Adjust the appearance of the app</p>
+                      <p className="text-slate-500 dark:text-text-secondary text-sm">Adjust the appearance of the app</p>
                     </div>
                   </div>
                   {/* Toggle Switch */}
@@ -139,21 +141,21 @@ export default function Profile() {
                     <input
                       type="checkbox"
                       className="sr-only peer"
-                      checked={darkMode}
-                      onChange={() => setDarkMode(!darkMode)}
+                      checked={theme === "dark"}
+                      onChange={toggleTheme}
                     />
-                    <div className="w-11 h-6 bg-slate-200 dark:bg-[#1a1622] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[#3a3347] peer-checked:bg-primary"></div>
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-surface-dark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-dark-lighter/50 peer-checked:bg-primary"></div>
                   </label>
                 </div>
-                <div className="h-px bg-slate-200 dark:bg-[#3a3347] w-full"></div>
+                <div className="h-px bg-slate-200 dark:bg-surface-dark-lighter/50 w-full"></div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-text-secondary">
                       <span className="material-symbols-outlined">notifications</span>
                     </div>
                     <div>
                       <p className="text-slate-900 dark:text-white font-medium">{t("profile.notifications")}</p>
-                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Receive daily summary and study reminders</p>
+                      <p className="text-slate-500 dark:text-text-secondary text-sm">Receive daily summary and study reminders</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -163,18 +165,18 @@ export default function Profile() {
                       checked={emailNotifications}
                       onChange={() => setEmailNotifications(!emailNotifications)}
                     />
-                    <div className="w-11 h-6 bg-slate-200 dark:bg-[#1a1622] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[#3a3347] peer-checked:bg-primary"></div>
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-surface-dark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-dark-lighter/50 peer-checked:bg-primary"></div>
                   </label>
                 </div>
-                <div className="h-px bg-slate-200 dark:bg-[#3a3347] w-full"></div>
+                <div className="h-px bg-slate-200 dark:bg-surface-dark-lighter/50 w-full"></div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-text-secondary">
                       <span className="material-symbols-outlined">language</span>
                     </div>
                     <div>
                       <p className="text-slate-900 dark:text-white font-medium">{t("profile.language")}</p>
-                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Select your preferred language</p>
+                      <p className="text-slate-500 dark:text-text-secondary text-sm">Select your preferred language</p>
                     </div>
                   </div>
                   <div className="w-40">
@@ -194,7 +196,7 @@ export default function Profile() {
               <div className="border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <p className="text-slate-900 dark:text-white font-medium">{t("profile.delete")}</p>
-                  <p className="text-slate-500 dark:text-[#a69db9] text-sm">Permanently delete your account and all data.</p>
+                  <p className="text-slate-500 dark:text-text-secondary text-sm">Permanently delete your account and all data.</p>
                 </div>
                 <button
                   onClick={() => confirm("Are you sure? This action cannot be undone.")}
@@ -228,7 +230,7 @@ export default function Profile() {
       {/* Main Content Area */}
       <main className="flex flex-1 flex-col overflow-y-auto bg-background-light dark:bg-background-dark">
         {/* Header (Dashboard Style for consistency) */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 px-6 backdrop-blur-md dark:border-[#2e2839] dark:bg-[#131118]/80">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 px-6 backdrop-blur-md dark:border-surface-dark-lighter dark:bg-surface-dark/80">
           <div className="flex items-center gap-4 md:hidden">
             <button className="text-slate-500 hover:text-slate-900 dark:text-white">
               <span className="material-symbols-outlined">menu</span>
@@ -239,17 +241,17 @@ export default function Profile() {
             {/* Empty spacer or search */}
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-[#2e2839] dark:text-white dark:hover:bg-[#3a3347]">
+            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-surface-dark-lighter/80">
               <span className="material-symbols-outlined">notifications</span>
             </button>
             <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-[#2e2839] dark:text-white dark:hover:bg-[#3a3347]"
+              onClick={toggleTheme}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-surface-dark-lighter/80"
             >
-              <span className="material-symbols-outlined">{darkMode ? "dark_mode" : "light_mode"}</span>
+              <span className="material-symbols-outlined">{theme === "dark" ? "light_mode" : "dark_mode"}</span>
             </button>
             <div className="h-8 w-8 overflow-hidden rounded-full md:hidden">
-              <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
+              <div className="h-full w-full bg-linear-to-br from-primary to-purple-400"></div>
             </div>
           </div>
         </header>
@@ -257,30 +259,30 @@ export default function Profile() {
         <div className="flex-1 flex justify-center py-8 px-4 md:px-10">
           <div className="w-full max-w-[1200px] flex flex-col gap-8 animate-fade-in">
             {/* Profile Header Section */}
-            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between p-6 rounded-2xl bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] shadow-lg transition-all hover:shadow-xl">
+            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between p-6 rounded-2xl bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 shadow-lg transition-all hover:shadow-xl">
               <div className="flex gap-6 items-center">
                 <div className="relative group cursor-pointer">
                   <div
-                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-24 w-24 md:h-32 md:w-32 ring-4 ring-slate-100 dark:ring-[#3a3347] overflow-hidden"
+                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-24 w-24 md:h-32 md:w-32 ring-4 ring-slate-100 dark:ring-surface-dark-lighter/50 overflow-hidden"
                   >
                     {userImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={userImage} alt={displayName} className="h-full w-full object-cover" />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400" />
+                      <div className="h-full w-full bg-linear-to-br from-primary to-purple-400" />
                     )}
                   </div>
                   <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="material-symbols-outlined text-white">edit</span>
                   </div>
-                  <div className="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full border-2 border-white dark:border-[#2e2839]">
+                  <div className="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full border-2 border-white dark:border-surface-dark-lighter">
                     <span className="material-symbols-outlined text-sm">verified</span>
                   </div>
                 </div>
                 <div className="flex flex-col">
                   <h1 className="text-slate-900 dark:text-white text-3xl font-bold leading-tight">{displayName}</h1>
-                  <p className="text-slate-500 dark:text-[#a69db9] text-base mt-1">{userEmail}</p>
-                  <div className="flex items-center gap-2 mt-2 text-sm text-slate-500 dark:text-[#a69db9]">
+                  <p className="text-slate-500 dark:text-text-secondary text-base mt-1">{userEmail}</p>
+                  <div className="flex items-center gap-2 mt-2 text-sm text-slate-500 dark:text-text-secondary">
                     <span className="material-symbols-outlined text-[18px]">calendar_month</span>
                     <span>Joined {joinDate}</span>
                   </div>
@@ -291,7 +293,7 @@ export default function Profile() {
                   <span className="material-symbols-outlined text-[20px]">workspace_premium</span>
                   Manage Subscription
                 </button>
-                <button className="flex items-center justify-center gap-2 bg-slate-100 dark:bg-[#1a1622] hover:bg-slate-200 dark:hover:bg-[#2e2839] text-slate-700 dark:text-white px-6 py-2.5 rounded-xl font-medium transition-all border border-slate-200 dark:border-[#3a3347]">
+                <button className="flex items-center justify-center gap-2 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-surface-dark-lighter text-slate-700 dark:text-white px-6 py-2.5 rounded-xl font-medium transition-all border border-slate-200 dark:border-surface-dark-lighter/50">
                   <span className="material-symbols-outlined text-[20px]">share</span>
                   Share Profile
                 </button>
@@ -305,21 +307,21 @@ export default function Profile() {
                 <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
                   <button
                     onClick={() => setActiveTab("overview")}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "overview" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "overview" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-text-secondary hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-dark-lighter"}`}
                   >
                     <span className="material-symbols-outlined">dashboard</span>
                     {t("nav.dashboard")}
                   </button>
                   <button
                     onClick={() => setActiveTab("history")}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "history" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "history" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-text-secondary hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-dark-lighter"}`}
                   >
                     <span className="material-symbols-outlined">history</span>
                     {t("profile.history")}
                   </button>
                   <button
                     onClick={() => setActiveTab("bookmarks")}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "bookmarks" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "bookmarks" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-text-secondary hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-dark-lighter"}`}
                   >
                     <span className="material-symbols-outlined">bookmark</span>
                     {t("profile.bookmarks")}
@@ -329,23 +331,23 @@ export default function Profile() {
                   </button>
                   <Link
                     href="/quizzes"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-text-secondary hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-dark-lighter transition-all whitespace-nowrap"
                   >
                     <span className="material-symbols-outlined">folder_special</span>
                     {t("nav.quizzes")}
                   </Link>
-                  <div className="h-px bg-slate-200 dark:bg-[#3a3347] my-2 hidden lg:block"></div>
-                  <p className="text-xs font-semibold text-slate-500 dark:text-[#a69db9] uppercase tracking-wider px-4 py-2 hidden lg:block">{t("nav.settings")}</p>
+                  <div className="h-px bg-slate-200 dark:bg-surface-dark-lighter/50 my-2 hidden lg:block"></div>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-text-secondary uppercase tracking-wider px-4 py-2 hidden lg:block">{t("nav.settings")}</p>
                   <button
                     onClick={() => setActiveTab("settings")}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "settings" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "settings" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-text-secondary hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-dark-lighter"}`}
                   >
                     <span className="material-symbols-outlined">settings</span>
                     {t("nav.settings")}
                   </button>
                   <button
                     onClick={() => setActiveTab("subscription")}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "subscription" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "subscription" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-text-secondary hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-dark-lighter"}`}
                   >
                     <span className="material-symbols-outlined">credit_card</span>
                     {t("profile.subscription")}
