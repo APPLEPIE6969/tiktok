@@ -1,0 +1,22 @@
+
+> study-app@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 2.9s
+  Running TypeScript ...
+Failed to compile.
+
+./lib/ai.ts:115:11
+Type error: 'modeConfig' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+
+  113 |
+  114 |   while (currentMode) {
+> 115 |     const modeConfig = AI_MODE_CONFIG[currentMode];
+      |           ^
+  116 |
+  117 |     try {
+  118 |       console.log(`Attempting quiz generation with ${currentMode} mode (${modeConfig.provider}/${modeConfig.model})`);
+Next.js build worker exited with code: 1 and signal: null

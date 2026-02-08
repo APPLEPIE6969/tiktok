@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { explainConcept } from "@/lib/ai";
 import { auth } from "@/lib/auth";
@@ -11,13 +10,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { query, context, provider } = body;
+    const { query, context } = body;
 
-    const explanation = await explainConcept(
-        query,
-        context,
-        provider
-    );
+    const explanation = await explainConcept(query, context);
 
     return NextResponse.json({ explanation });
   } catch (error) {

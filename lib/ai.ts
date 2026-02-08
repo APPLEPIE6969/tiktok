@@ -1,16 +1,130 @@
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Groq from "groq-sdk";
-import { GEMINI_MODELS, GROQ_MODELS } from "./ai-config";
 
 // Initialize clients
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy_key" }); // Safe fallback for build
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy_key" });
+
+// =============================================================================
+// MODEL CATALOG
+// =============================================================================
+
+// All available text generation models for quiz generation
+const TEXT_MODELS = {
+  // Gemini Models (ordered by capability)
+  GEMINI_FLASH_25: { provider: "gemini" as const, model: "gemini-2.5-flash" },
+  GEMINI_FLASH_3: { provider: "gemini" as const, model: "gemini-3-flash-preview" },
+  GEMINI_FLASH_LITE: { provider: "gemini" as const, model: "gemini-2.5-flash-lite" },
+  GEMMA_27B: { provider: "gemini" as const, model: "gemma-3-27b" },
+  GEMMA_12B: { provider: "gemini" as const, model: "gemma-3-12b" },
+  GEMMA_4B: { provider: "gemini" as const, model: "gemma-3-4b" },
+  GEMMA_1B: { provider: "gemini" as const, model: "gemma-3-1b" },
+
+  // Groq Models (ordered by capability)
+  GPT_OSS_120B: { provider: "groq" as const, model: "openai/gpt-oss-120b" },
+  LLAMA_70B: { provider: "groq" as const, model: "llama-3.3-70b-versatile" },
+  QWEN_32B: { provider: "groq" as const, model: "qwen/qwen3-32b" },
+  KIMI_K2: { provider: "groq" as const, model: "moonshotai/kimi-k2-instruct-0905" },
+  GPT_OSS_20B: { provider: "groq" as const, model: "openai/gpt-oss-20b" },
+  LLAMA_4_MAVERICK: { provider: "groq" as const, model: "meta-llama/llama-4-maverick-17b-128e-instruct" },
+  LLAMA_4_SCOUT: { provider: "groq" as const, model: "meta-llama/llama-4-scout-17b-16e-instruct" },
+  COMPOUND: { provider: "groq" as const, model: "groq/compound" },
+  COMPOUND_MINI: { provider: "groq" as const, model: "groq/compound-mini" },
+  LLAMA_8B: { provider: "groq" as const, model: "llama-3.1-8b-instant" },
+};
+
+// Special purpose models (not for quiz generation)
+export const SPECIAL_MODELS = {
+  // Image Generation (Gemini)
+  IMAGE: "gemini-2.5-flash-image",
+  IMAGE_PREVIEW: "gemini-2.5-flash-image-preview",
+
+  // Audio/TTS (Gemini)
+  TTS: "gemini-2.5-flash-preview-tts",
+  AUDIO: "gemini-2.5-flash-native-audio-preview-05-06",
+
+  // Embeddings (Gemini)
+  EMBEDDING: "gemini-embedding-1",
+
+  // Audio (Groq)
+  WHISPER_V3: "whisper-large-v3",
+  WHISPER_TURBO: "whisper-large-v3-turbo",
+  ORPHEUS_TTS: "canopylabs/orpheus-v1-english",
+  ORPHEUS_ARABIC: "canopylabs/orpheus-arabic-saudi",
+
+  // Safety (Groq)
+  GUARD_12B: "meta-llama/llama-guard-4-12b",
+  PROMPT_GUARD_22M: "meta-llama/llama-prompt-guard-2-22m",
+  PROMPT_GUARD_86M: "meta-llama/llama-prompt-guard-2-86m",
+  SAFEGUARD_20B: "openai/gpt-oss-safeguard-20b",
+};
+
+// =============================================================================
+// AI MODE CONFIGURATION
+// =============================================================================
+
+export type AIMode = "fast" | "balanced" | "smart";
+
+type ModelEntry = { provider: "groq" | "gemini"; model: string };
+
+// Complete fallback chains for each mode (uses ALL text models)
+const FALLBACK_CHAINS: Record<AIMode, ModelEntry[]> = {
+  // Smart: Start with best Gemini, fall through all models
+  smart: [
+    TEXT_MODELS.GEMINI_FLASH_25,
+    TEXT_MODELS.GEMINI_FLASH_3,
+    TEXT_MODELS.GPT_OSS_120B,
+    TEXT_MODELS.LLAMA_70B,
+    TEXT_MODELS.QWEN_32B,
+    TEXT_MODELS.GEMMA_27B,
+    TEXT_MODELS.KIMI_K2,
+    TEXT_MODELS.GPT_OSS_20B,
+    TEXT_MODELS.LLAMA_4_MAVERICK,
+    TEXT_MODELS.LLAMA_4_SCOUT,
+    TEXT_MODELS.GEMMA_12B,
+    TEXT_MODELS.GEMINI_FLASH_LITE,
+    TEXT_MODELS.COMPOUND,
+    TEXT_MODELS.COMPOUND_MINI,
+    TEXT_MODELS.GEMMA_4B,
+    TEXT_MODELS.LLAMA_8B,
+    TEXT_MODELS.GEMMA_1B,
+  ],
+
+  // Balanced: Start with Groq 70B, use most models
+  balanced: [
+    TEXT_MODELS.LLAMA_70B,
+    TEXT_MODELS.QWEN_32B,
+    TEXT_MODELS.KIMI_K2,
+    TEXT_MODELS.GPT_OSS_20B,
+    TEXT_MODELS.LLAMA_4_MAVERICK,
+    TEXT_MODELS.LLAMA_4_SCOUT,
+    TEXT_MODELS.GEMINI_FLASH_LITE,
+    TEXT_MODELS.COMPOUND,
+    TEXT_MODELS.COMPOUND_MINI,
+    TEXT_MODELS.GEMMA_12B,
+    TEXT_MODELS.GEMMA_4B,
+    TEXT_MODELS.LLAMA_8B,
+    TEXT_MODELS.GEMMA_1B,
+  ],
+
+  // Fast: Start with fastest, minimal fallbacks
+  fast: [
+    TEXT_MODELS.LLAMA_8B,
+    TEXT_MODELS.COMPOUND_MINI,
+    TEXT_MODELS.GEMMA_4B,
+    TEXT_MODELS.GEMMA_1B,
+    TEXT_MODELS.GEMINI_FLASH_LITE,
+  ],
+};
+
+// =============================================================================
+// QUIZ GENERATION
+// =============================================================================
 
 export interface QuizQuestion {
   question: string;
   options: string[];
-  correctAnswer: string; // The correct option string
+  correctAnswer: string;
   explanation: string;
 }
 
@@ -18,94 +132,128 @@ export interface QuizGenerationParams {
   topic: string;
   difficulty: string;
   type: string;
-  amount: number;
-  model?: string;
+  amount: number | "recommended";
+  language: string;
+  customContent?: string;
 }
 
-export async function generateQuizWithGemini(params: QuizGenerationParams): Promise<QuizQuestion[]> {
-  const modelName = params.model || GEMINI_MODELS.FLASH;
-  const model = genAI.getGenerativeModel({ model: modelName });
+function buildQuizPrompt(params: QuizGenerationParams): string {
+  const questionCount = params.amount === "recommended"
+    ? "an appropriate number (between 5-15 based on topic complexity)"
+    : params.amount;
 
-  const prompt = `
-    Generate a quiz about "${params.topic}".
-    Difficulty: ${params.difficulty}.
-    Question Type: ${params.type}.
-    Number of Questions: ${params.amount}.
+  const customContentSection = params.customContent
+    ? `\n\nIMPORTANT: Use ONLY the following source material to generate questions. Do not use any external knowledge:\n---\n${params.customContent}\n---\n`
+    : "";
 
-    Output strictly valid JSON in the following format:
-    [
-      {
-        "question": "Question text here",
-        "options": ["Option A", "Option B", "Option C", "Option D"],
-        "correctAnswer": "Option A",
-        "explanation": "Brief explanation of why it is correct."
-      }
-    ]
-    Do not include markdown code blocks. Just the raw JSON string.
-  `;
+  return `Generate a quiz about "${params.topic}".${customContentSection}
+Difficulty: ${params.difficulty}.
+Question Type: ${params.type}.
+Number of Questions: ${questionCount}.
+Language: Generate all questions, options, and explanations in ${params.language}.
 
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    // Clean up markdown if present
-    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanedText);
-  } catch (error) {
-    console.error("Gemini Generation Error:", error);
-    throw new Error("Failed to generate quiz with Gemini");
+Output strictly valid JSON in the following format:
+[
+  {
+    "question": "Question text here",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctAnswer": "Option A",
+    "explanation": "Brief explanation of why it is correct."
   }
+]
+Do not include markdown code blocks. Just the raw JSON array.`;
 }
 
-export async function generateQuizWithGroq(params: QuizGenerationParams): Promise<QuizQuestion[]> {
-  const modelName = params.model || GROQ_MODELS.LLAMA_3_3_70B_VERSATILE;
+async function generateWithGemini(prompt: string, modelName: string): Promise<QuizQuestion[]> {
+  const model = genAI.getGenerativeModel({ model: modelName });
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+  const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  return JSON.parse(cleanedText);
+}
 
-  const prompt = `
-    Generate a quiz about "${params.topic}".
-    Difficulty: ${params.difficulty}.
-    Question Type: ${params.type}.
-    Number of Questions: ${params.amount}.
+async function generateWithGroq(prompt: string, modelName: string): Promise<QuizQuestion[]> {
+  const completion = await groq.chat.completions.create({
+    messages: [{ role: "user", content: prompt }],
+    model: modelName,
+    temperature: 0.5,
+  });
 
-    Output strictly valid JSON in the following format:
-    [
-      {
-        "question": "Question text here",
-        "options": ["Option A", "Option B", "Option C", "Option D"],
-        "correctAnswer": "Option A",
-        "explanation": "Brief explanation of why it is correct."
+  const text = completion.choices[0]?.message?.content || "[]";
+  const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  return JSON.parse(cleanedText);
+}
+
+/**
+ * Generate quiz with comprehensive model fallback chain
+ * Tries every model in the chain until one succeeds
+ */
+export async function generateQuiz(
+  mode: AIMode,
+  params: QuizGenerationParams
+): Promise<{ questions: QuizQuestion[]; usedMode: AIMode; usedModel: string }> {
+  const prompt = buildQuizPrompt(params);
+  const fallbackChain = FALLBACK_CHAINS[mode];
+
+  let lastError: Error | null = null;
+
+  for (const { provider, model } of fallbackChain) {
+    try {
+      console.log(`Trying ${provider}/${model}...`);
+
+      let questions: QuizQuestion[];
+      if (provider === "gemini") {
+        questions = await generateWithGemini(prompt, model);
+      } else {
+        questions = await generateWithGroq(prompt, model);
       }
-    ]
-    Do not include markdown code blocks or intro text. Just the raw JSON array.
-  `;
+
+      if (!Array.isArray(questions) || questions.length === 0) {
+        throw new Error("Invalid response: empty or not an array");
+      }
+
+      console.log(`Success with ${provider}/${model}`);
+      return { questions, usedMode: mode, usedModel: model };
+    } catch (error) {
+      console.error(`${provider}/${model} failed:`, error);
+      lastError = error as Error;
+    }
+  }
+
+  throw lastError || new Error("All models failed to generate quiz");
+}
+
+// =============================================================================
+// ADDITIONAL AI FEATURES
+// =============================================================================
+
+export async function explainConcept(concept: string, context?: string): Promise<string> {
+  const prompt = `Explain the concept of "${concept}" simply and clearly. ${context ? `Context: ${context}` : ""} Use an analogy if possible. Keep it concise.`;
 
   try {
     const completion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: modelName,
-      temperature: 0.5,
+      model: TEXT_MODELS.LLAMA_8B.model,
     });
-
-    const text = completion.choices[0]?.message?.content || "[]";
-    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanedText);
-  } catch (error) {
-    console.error("Groq Generation Error:", error);
-    throw new Error("Failed to generate quiz with Groq");
+    return completion.choices[0]?.message?.content || "Could not generate explanation.";
+  } catch {
+    const model = genAI.getGenerativeModel({ model: TEXT_MODELS.GEMINI_FLASH_LITE.model });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   }
 }
 
-export async function explainConcept(concept: string, context?: string, modelProvider: "gemini" | "groq" = "groq"): Promise<string> {
-    const prompt = `Explain the concept of "${concept}" simply and clearly. ${context ? `Context: ${context}` : ""} Use an analogy if possible. Keep it concise.`;
+export async function generateEmbedding(text: string): Promise<number[]> {
+  const model = genAI.getGenerativeModel({ model: SPECIAL_MODELS.EMBEDDING });
+  const result = await model.embedContent(text);
+  return result.embedding.values;
+}
 
-    if (modelProvider === "gemini") {
-        const model = genAI.getGenerativeModel({ model: GEMINI_MODELS.FLASH });
-        const result = await model.generateContent(prompt);
-        return result.response.text();
-    } else {
-        const completion = await groq.chat.completions.create({
-            messages: [{ role: "user", content: prompt }],
-            model: GROQ_MODELS.LLAMA_3_1_8B_INSTANT,
-        });
-        return completion.choices[0]?.message?.content || "Could not generate explanation.";
-    }
+export async function transcribeAudio(audioBase64: string): Promise<string> {
+  const completion = await groq.audio.transcriptions.create({
+    file: audioBase64 as unknown as File,
+    model: SPECIAL_MODELS.WHISPER_TURBO,
+  });
+  return completion.text;
 }

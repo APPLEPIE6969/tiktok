@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { explainConcept } from "@/lib/ai";
 import { auth } from "@/lib/auth";
@@ -11,12 +10,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { question, context, provider } = body;
+    const { question, context } = body;
 
     const explanation = await explainConcept(
-        `Hint for question: "${question}".`,
-        `Context: The correct answer involves ${context || "general knowledge"}. Don't give the answer directly, just a hint.`,
-        provider
+      `Hint for question: "${question}".`,
+      `Context: The correct answer involves ${context || "general knowledge"}. Don't give the answer directly, just a hint.`
     );
 
     return NextResponse.json({ hint: explanation });

@@ -1,0 +1,129 @@
+"use client"
+
+import { QuizQuestion } from "./ai"
+
+// Saved quiz interface
+export interface SavedQuiz {
+    id: string
+    title: string
+    topic: string
+    difficulty: string
+    questionType: string
+    language: string
+    aiMode: "fast" | "balanced" | "smart"
+    instantFeedback: boolean
+    questions: QuizQuestion[]
+    createdAt: string
+    completedAt?: string
+    score?: number
+    totalQuestions: number
+}
+
+// Quiz generation settings
+export interface QuizSettings {
+    topic: string
+    difficulty: string
+    questionType: string
+    questionCount: number | "recommended"
+    language: string
+    aiMode: "fast" | "balanced" | "smart"
+    instantFeedback: boolean
+    customContent?: string
+}
+
+const QUIZZES_KEY = "studyflow_quizzes"
+
+/**
+ * Get all saved quizzes for the user
+ */
+export function getUserQuizzes(): SavedQuiz[] {
+    if (typeof window === "undefined") return []
+
+    try {
+        const data = localStorage.getItem(QUIZZES_KEY)
+        if (!data) return []
+        return JSON.parse(data) as SavedQuiz[]
+    } catch {
+        return []
+    }
+}
+
+/**
+ * Get a specific quiz by ID
+ */
+export function getQuizById(id: string): SavedQuiz | null {
+    const quizzes = getUserQuizzes()
+    return quizzes.find(q => q.id === id) || null
+}
+
+/**
+ * Save a new quiz
+ */
+export function saveQuiz(quiz: Omit<SavedQuiz, "id" | "createdAt">): SavedQuiz {
+    const quizzes = getUserQuizzes()
+
+    const newQuiz: SavedQuiz = {
+        ...quiz,
+        id: `quiz_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: new Date().toISOString(),
+    }
+
+    quizzes.unshift(newQuiz) // Add to beginning (most recent first)
+
+    if (typeof window !== "undefined") {
+        localStorage.setItem(QUIZZES_KEY, JSON.stringify(quizzes))
+    }
+
+    return newQuiz
+}
+
+/**
+ * Update an existing quiz (e.g., mark as completed with score)
+ */
+export function updateQuiz(id: string, updates: Partial<SavedQuiz>): SavedQuiz | null {
+    const quizzes = getUserQuizzes()
+    const index = quizzes.findIndex(q => q.id === id)
+
+    if (index === -1) return null
+
+    quizzes[index] = { ...quizzes[index], ...updates }
+
+    if (typeof window !== "undefined") {
+        localStorage.setItem(QUIZZES_KEY, JSON.stringify(quizzes))
+    }
+
+    return quizzes[index]
+}
+
+/**
+ * Delete a quiz by ID
+ */
+export function deleteQuiz(id: string): boolean {
+    const quizzes = getUserQuizzes()
+    const filtered = quizzes.filter(q => q.id !== id)
+
+    if (filtered.length === quizzes.length) return false
+
+    if (typeof window !== "undefined") {
+        localStorage.setItem(QUIZZES_KEY, JSON.stringify(filtered))
+    }
+
+    return true
+}
+
+/**
+ * Get quiz statistics
+ */
+export function getQuizStats() {
+    const quizzes = getUserQuizzes()
+    const completed = quizzes.filter(q => q.completedAt)
+
+    const totalScore = completed.reduce((sum, q) => sum + (q.score || 0), 0)
+    const totalQuestions = completed.reduce((sum, q) => sum + q.totalQuestions, 0)
+
+    return {
+        totalQuizzes: quizzes.length,
+        completedQuizzes: completed.length,
+        averageScore: totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0,
+    }
+}
