@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google-analytics.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    img-src 'self' blob: data: https://*.googleusercontent.com https://lh3.googleusercontent.com; 
+    img-src 'self' blob: data: https://*.googleusercontent.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com; 
     font-src 'self' https://fonts.gstatic.com;
     connect-src 'self' https://generativelanguage.googleapis.com https://api.groq.com;
     object-src 'none';

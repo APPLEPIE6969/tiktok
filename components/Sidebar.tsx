@@ -26,8 +26,8 @@ export function Sidebar() {
   const { t } = useLanguage()
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white dark:border-[#2e2839] dark:bg-[#131118] md:flex h-screen sticky top-0">
-      <div className="flex h-16 items-center gap-3 px-6 border-b border-gray-200 dark:border-[#2e2839] shrink-0">
+    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white dark:border-surface-dark-lighter/50 dark:bg-surface-dark md:flex h-screen sticky top-0">
+      <div className="flex h-16 items-center gap-3 px-6 border-b border-gray-200 dark:border-surface-dark-lighter/50 shrink-0">
         <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
           <span className="material-symbols-outlined text-xl">school</span>
         </div>
@@ -44,7 +44,7 @@ export function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${isActive
                   ? "bg-primary/10 text-primary"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#a69db9] dark:hover:bg-[#2e2839] dark:hover:text-white"
+                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-text-secondary dark:hover:bg-surface-dark-lighter dark:hover:text-white"
                   }`}
               >
                 <span className={`material-symbols-outlined ${isActive ? "fill" : ""}`}>{item.icon}</span>
@@ -63,7 +63,7 @@ export function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${isActive
                   ? "bg-primary/10 text-primary"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#a69db9] dark:hover:bg-[#2e2839] dark:hover:text-white"
+                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-text-secondary dark:hover:bg-surface-dark-lighter dark:hover:text-white"
                   }`}
               >
                 <span className="material-symbols-outlined">{item.icon}</span>
@@ -72,7 +72,7 @@ export function Sidebar() {
             )
           })}
 
-          <div className="mt-4 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-[#2e2839] dark:bg-[#1a1622]">
+          <div className="mt-4 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-surface-dark-lighter/50 dark:bg-surface-dark-lighter">
             <div className="h-10 w-10 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
               {session?.user?.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -83,7 +83,7 @@ export function Sidebar() {
             </div>
             <div className="flex flex-1 flex-col">
               <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{session?.user?.name || "Guest User"}</p>
-              <p className="text-xs text-slate-500 dark:text-[#a69db9]">Level {userProfile?.stats?.currentLevel || 1} Apprentice</p>
+              <p className="text-xs text-slate-500 dark:text-text-secondary">{t("sidebar.level", userProfile?.stats?.currentLevel || 1)} {t("sidebar.apprentice")}</p>
             </div>
           </div>
         </div>

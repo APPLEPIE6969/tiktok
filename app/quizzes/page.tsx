@@ -8,10 +8,12 @@ import { useEffect, useState } from "react"
 import { isOnboardingComplete } from "@/lib/userStore"
 import { getUserQuizzes, deleteQuiz, SavedQuiz } from "@/lib/quizStore"
 import Link from "next/link"
+import { useLanguage } from "@/lib/i18n"
 
 export default function MyQuizzes() {
     const { data: session, status } = useSession()
     const router = useRouter()
+    const { t } = useLanguage()
     const [quizzes, setQuizzes] = useState<SavedQuiz[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
@@ -33,7 +35,7 @@ export default function MyQuizzes() {
     }, [status, session, router])
 
     const handleDelete = (id: string) => {
-        if (confirm("Are you sure you want to delete this quiz?")) {
+        if (confirm(t("quizzes.delete_confirm"))) {
             deleteQuiz(id)
             setQuizzes(getUserQuizzes())
         }
@@ -54,7 +56,7 @@ export default function MyQuizzes() {
             <div className="flex h-screen w-full items-center justify-center bg-background-dark">
                 <div className="flex flex-col items-center gap-4">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                    <p className="text-white/60">Loading...</p>
+                    <p className="text-white/60">{t("common.loading")}</p>
                 </div>
             </div>
         )
@@ -65,13 +67,13 @@ export default function MyQuizzes() {
             <Sidebar />
             <main className="flex-1 flex flex-col overflow-y-auto bg-background-light dark:bg-background-dark p-8">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white animate-fade-in">My Quizzes</h1>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white animate-fade-in">{t("quizzes.title")}</h1>
                     <Link
                         href="/quiz/generator"
                         className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:scale-105"
                     >
                         <span className="material-symbols-outlined text-lg">add</span>
-                        New Quiz
+                        {t("quizzes.new_quiz")}
                     </Link>
                 </div>
 
@@ -80,10 +82,10 @@ export default function MyQuizzes() {
                         {quizzes.map((quiz, index) => (
                             <div
                                 key={quiz.id}
-                                className={`group bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] rounded-2xl overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02] animate-fade-in-up stagger-${Math.min(index + 1, 5)}`}
+                                className={`group bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02] animate-fade-in-up stagger-${Math.min(index + 1, 5)}`}
                             >
                                 {/* Quiz Header */}
-                                <div className="p-5 border-b border-slate-100 dark:border-[#3a3347]">
+                                <div className="p-5 border-b border-slate-100 dark:border-surface-dark-lighter/50">
                                     <div className="flex items-start justify-between mb-2">
                                         <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-2">
                                             {quiz.title}
@@ -99,10 +101,10 @@ export default function MyQuizzes() {
                                         <span className="text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary font-medium">
                                             {quiz.difficulty}
                                         </span>
-                                        <span className="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-[#1a1622] text-slate-600 dark:text-[#a69db9] font-medium">
+                                        <span className="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-surface-dark text-slate-600 dark:text-text-secondary font-medium">
                                             {quiz.questionType}
                                         </span>
-                                        <span className="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-[#1a1622] text-slate-600 dark:text-[#a69db9] font-medium">
+                                        <span className="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-surface-dark text-slate-600 dark:text-text-secondary font-medium">
                                             {quiz.language}
                                         </span>
                                     </div>
@@ -113,7 +115,7 @@ export default function MyQuizzes() {
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-2">
                                             <span className="material-symbols-outlined text-primary text-lg">quiz</span>
-                                            <span className="text-sm text-slate-600 dark:text-[#a69db9]">{quiz.totalQuestions} questions</span>
+                                            <span className="text-sm text-slate-600 dark:text-text-secondary">{t("quizzes.questions_count", quiz.totalQuestions)}</span>
                                         </div>
                                         {quiz.completedAt && quiz.score !== undefined && (
                                             <div className="flex items-center gap-1">
@@ -123,14 +125,14 @@ export default function MyQuizzes() {
                                     </div>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs text-slate-400 dark:text-[#a69db9]/60">
+                                        <span className="text-xs text-slate-400 dark:text-text-secondary/60">
                                             {formatDate(quiz.createdAt)}
                                         </span>
                                         <Link
                                             href={`/quiz/${quiz.id}?feedback=${quiz.instantFeedback}`}
                                             className="inline-flex items-center gap-1 text-primary text-sm font-semibold hover:underline"
                                         >
-                                            {quiz.completedAt ? "Retake" : "Start"}
+                                            {quiz.completedAt ? t("quizzes.retake") : t("quizzes.start_quiz")}
                                             <span className="material-symbols-outlined text-lg">arrow_forward</span>
                                         </Link>
                                     </div>
@@ -140,12 +142,12 @@ export default function MyQuizzes() {
                     </div>
                 ) : (
                     <div className="flex-1 flex items-center justify-center">
-                        <div className="rounded-2xl bg-white dark:bg-[#2e2839] shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10 max-w-md w-full">
+                        <div className="rounded-2xl bg-white dark:bg-surface-dark-lighter shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10 max-w-md w-full">
                             <EmptyState
                                 icon="quiz"
-                                title="No quizzes yet"
-                                description="Generate your first AI-powered quiz to start learning."
-                                actionLabel="Generate Quiz"
+                                title={t("quizzes.no_quizzes")}
+                                description={t("quizzes.no_quizzes_desc")}
+                                actionLabel={t("quizzes.new_quiz")}
                                 actionHref="/quiz/generator"
                             />
                         </div>

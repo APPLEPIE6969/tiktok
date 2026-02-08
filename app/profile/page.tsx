@@ -24,6 +24,7 @@ export default function Profile() {
   // State for tabs and settings
   const [activeTab, setActiveTab] = useState("overview")
   const [emailNotifications, setEmailNotifications] = useState(true)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   // Update language in user profile when changed
   const handleLanguageChange = (newLanguage: string) => {
@@ -61,44 +62,44 @@ export default function Profile() {
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl text-primary">quiz</span>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Total Quizzes</p>
+                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">{t("profile.total_quizzes")}</p>
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.totalQuizzes || 0}</p>
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
-                  {(stats?.totalQuizzes || 0) === 0 ? "Take your first quiz!" : "Keep learning!"}
+                  {(stats?.totalQuizzes || 0) === 0 ? t("profile.nothing_to_continue") : t("dashboard.learned_minutes", 0)}
                 </p>
               </div>
               <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-2">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl text-primary">target</span>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Accuracy Score</p>
+                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">{t("profile.accuracy_score")}</p>
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.accuracyScore || 0}%</p>
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
-                  {(stats?.accuracyScore || 0) === 0 ? "Complete quizzes to track accuracy" : "Keep improving!"}
+                  {(stats?.accuracyScore || 0) === 0 ? t("profile.nothing_to_continue_desc") : t("dashboard.learned_minutes", 0)}
                 </p>
               </div>
               <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-3">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <span className="material-symbols-outlined text-6xl text-primary">schedule</span>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">Hours Studied</p>
+                <p className="text-slate-500 dark:text-text-secondary text-sm font-medium uppercase tracking-wider">{t("profile.hours_studied")}</p>
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.hoursStudied || 0}h</p>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">Daily streak: {stats?.dailyStreak || 0} days</p>
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">{t("profile.daily_streak_full", stats?.dailyStreak || 0)}</p>
               </div>
             </div>
 
             {/* Recent Activity Section */}
             <section>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-slate-900 dark:text-white text-xl font-bold">Continue Learning</h3>
+                <h3 className="text-slate-900 dark:text-white text-xl font-bold">{t("profile.continue_learning")}</h3>
                 {hasLearningContent && (
-                  <Link className="text-primary text-sm font-medium hover:underline" href="#">View All</Link>
+                  <Link className="text-primary text-sm font-medium hover:underline" href="#">{t("profile.view_all")}</Link>
                 )}
               </div>
 
@@ -110,9 +111,9 @@ export default function Profile() {
                 <div className="rounded-2xl bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50">
                   <EmptyState
                     icon="school"
-                    title="Nothing to continue"
-                    description="Start a quiz or course to track your progress here."
-                    actionLabel="Generate Quiz"
+                    title={t("profile.nothing_to_continue")}
+                    description={t("profile.nothing_to_continue_desc")}
+                    actionLabel={t("profile.generate_quiz_action")}
                     actionHref="/quiz/generator"
                   />
                 </div>
@@ -213,9 +214,9 @@ export default function Profile() {
           <div className="flex items-center justify-center py-20">
             <EmptyState
               icon="construction"
-              title="Coming Soon"
-              description="This section is currently under development."
-              actionLabel="Go Back"
+              title={t("profile.coming_soon")}
+              description={t("profile.coming_soon_desc")}
+              actionLabel={t("profile.go_back")}
               onAction={() => setActiveTab("overview")}
             />
           </div>
@@ -241,9 +242,48 @@ export default function Profile() {
             {/* Empty spacer or search */}
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-surface-dark-lighter/80">
-              <span className="material-symbols-outlined">notifications</span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-surface-dark-lighter/80"
+              >
+                <span className="material-symbols-outlined">notifications</span>
+                {/* Notification Badge */}
+                <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-surface-dark"></span>
+              </button>
+
+              {/* Notifications Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 top-12 z-50 w-80 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl dark:border-surface-dark-lighter/50 dark:bg-surface-dark-lighter animate-fade-in-up">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-bold text-slate-900 dark:text-white">{t("profile.notifications_title")}</h4>
+                    <button className="text-xs text-primary hover:underline">{t("profile.mark_all_read")}</button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex gap-3 items-start">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary">
+                        <span className="material-symbols-outlined text-sm">rocket_launch</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">{t("profile.welcome_message")}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t("profile.welcome_desc")}</p>
+                        <p className="text-[10px] text-slate-400 mt-1">{t("profile.just_now")}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 items-start opacity-60">
+                      <div className="h-8 w-8 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 text-green-500">
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">Profile completed</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">You're all set up.</p>
+                        <p className="text-[10px] text-slate-400 mt-1">1h ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               onClick={toggleTheme}
               className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-surface-dark-lighter/80"
@@ -291,11 +331,11 @@ export default function Profile() {
               <div className="flex flex-col gap-3 w-full md:w-auto">
                 <button className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-medium transition-all hover:scale-[1.02] active:scale-[0.98]">
                   <span className="material-symbols-outlined text-[20px]">workspace_premium</span>
-                  Manage Subscription
+                  {t("profile.manage_subscription")}
                 </button>
                 <button className="flex items-center justify-center gap-2 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-surface-dark-lighter text-slate-700 dark:text-white px-6 py-2.5 rounded-xl font-medium transition-all border border-slate-200 dark:border-surface-dark-lighter/50">
                   <span className="material-symbols-outlined text-[20px]">share</span>
-                  Share Profile
+                  {t("profile.share_profile")}
                 </button>
               </div>
             </div>

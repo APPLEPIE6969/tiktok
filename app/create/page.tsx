@@ -9,11 +9,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, FileText, Plus, Trash2, Loader2, Save, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { useLanguage } from "@/lib/i18n"
 
 import { saveQuiz, SavedQuiz } from "@/lib/quizStore"
 
 export default function Create() {
     const router = useRouter()
+    const { t } = useLanguage()
     const [activeTab, setActiveTab] = useState<"ai" | "manual">("ai")
     const [title, setTitle] = useState("")
     const [topic, setTopic] = useState("")
@@ -38,7 +40,7 @@ export default function Create() {
 
     const handleSave = () => {
         if (!title) {
-            alert("Please enter a title")
+            alert(t("create.error_title"))
             return
         }
 
@@ -59,7 +61,7 @@ export default function Create() {
             }))
 
         if (questions.length === 0) {
-            alert("Please add some terms")
+            alert(t("create.error_terms"))
             return
         }
 
@@ -96,17 +98,17 @@ export default function Create() {
                             <ArrowLeft className="h-5 w-5" />
                         </Button>
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Create Study Set</h1>
-                            <p className="text-slate-500 dark:text-slate-400">Create flashcards and quizzes using AI or manually.</p>
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t("create.title")}</h1>
+                            <p className="text-slate-500 dark:text-slate-400">{t("create.subtitle")}</p>
                         </div>
                     </div>
 
                     <div className="grid gap-8">
                         {/* Title Section */}
                         <div className="p-6 bg-white dark:bg-surface-dark-lighter rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <label className="block text-sm font-bold mb-2 text-slate-500 dark:text-slate-400 uppercase tracking-wide">Title</label>
+                            <label className="block text-sm font-bold mb-2 text-slate-500 dark:text-slate-400 uppercase tracking-wide">{t("create.set_title")}</label>
                             <Input
-                                placeholder="e.g. Biology 101 - Cell Structure"
+                                placeholder={t("create.set_title_placeholder")}
                                 className="text-xl py-6 border-none bg-transparent shadow-none focus-visible:ring-0 px-0 placeholder:text-slate-300 dark:placeholder:text-slate-600 font-bold text-slate-900 dark:text-white"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
@@ -129,7 +131,7 @@ export default function Create() {
                                 <div className={cn("p-3 rounded-xl transition-colors", activeTab === "ai" ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800")}>
                                     <Sparkles className="h-6 w-6" />
                                 </div>
-                                <span className="font-bold text-lg">Generate with AI</span>
+                                <span className="font-bold text-lg">{t("create.tab_ai")}</span>
                             </button>
                             <button
                                 onClick={() => setActiveTab("manual")}
@@ -143,7 +145,7 @@ export default function Create() {
                                 <div className={cn("p-3 rounded-xl transition-colors", activeTab === "manual" ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800")}>
                                     <FileText className="h-6 w-6" />
                                 </div>
-                                <span className="font-bold text-lg">Create Manually</span>
+                                <span className="font-bold text-lg">{t("create.tab_manual")}</span>
                             </button>
                         </div>
 
@@ -162,15 +164,15 @@ export default function Create() {
                                         <CardHeader>
                                             <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
                                                 <Sparkles className="h-5 w-5 text-primary" />
-                                                AI Generator
+                                                {t("create.ai_generator_title")}
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Topic or Text</label>
+                                                <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">{t("create.topic_label")}</label>
                                                 <textarea
                                                     className="flex min-h-[150px] w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1622] px-4 py-3 text-sm ring-offset-background placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y text-slate-900 dark:text-white"
-                                                    placeholder="Paste your notes here, enter a topic, or describe what you want to learn..."
+                                                    placeholder={t("create.topic_placeholder")}
                                                     value={topic}
                                                     onChange={(e) => setTopic(e.target.value)}
                                                 />
@@ -184,12 +186,12 @@ export default function Create() {
                                                 {isGenerating ? (
                                                     <>
                                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                        Generating Magic...
+                                                        {t("create.generating")}
                                                     </>
                                                 ) : (
                                                     <>
                                                         <Sparkles className="mr-2 h-5 w-5" />
-                                                        Generate Flashcards
+                                                        {t("create.generate_button")}
                                                     </>
                                                 )}
                                             </Button>
@@ -199,8 +201,8 @@ export default function Create() {
                                     {generatedTerms.length > 0 && (
                                         <div className="space-y-4">
                                             <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                                                Generated Preview
-                                                <span className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">{generatedTerms.length} cards</span>
+                                                {t("create.preview_title")}
+                                                <span className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">{generatedTerms.length} {t("create.cards_count")}</span>
                                             </h3>
                                             <div className="grid gap-4">
                                                 {generatedTerms.map((item, i) => (
@@ -222,7 +224,7 @@ export default function Create() {
                                                 onClick={handleSave}
                                             >
                                                 <Save className="mr-2 h-5 w-5" />
-                                                Save & Create Quiz
+                                                {t("create.save_button")}
                                             </Button>
                                         </div>
                                     )}
@@ -250,11 +252,11 @@ export default function Create() {
                                                             {i + 1}
                                                         </div>
                                                         <div className="flex-1 space-y-2">
-                                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Term</label>
+                                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("create.term_label")}</label>
                                                             <Input
                                                                 value={item.term}
                                                                 className="border-b-2 border-x-0 border-t-0 rounded-none focus-visible:ring-0 focus-visible:border-primary px-0 text-lg bg-transparent border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                                                                placeholder="Enter term"
+                                                                placeholder={t("create.term_placeholder")}
                                                                 onChange={(e) => {
                                                                     const newTerms = [...manualTerms]
                                                                     newTerms[i].term = e.target.value
@@ -263,11 +265,11 @@ export default function Create() {
                                                             />
                                                         </div>
                                                         <div className="flex-1 space-y-2">
-                                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Definition</label>
+                                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("create.definition_label")}</label>
                                                             <Input
                                                                 value={item.definition}
                                                                 className="border-b-2 border-x-0 border-t-0 rounded-none focus-visible:ring-0 focus-visible:border-primary px-0 text-lg bg-transparent border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                                                                placeholder="Enter definition"
+                                                                placeholder={t("create.definition_placeholder")}
                                                                 onChange={(e) => {
                                                                     const newTerms = [...manualTerms]
                                                                     newTerms[i].definition = e.target.value
@@ -287,11 +289,11 @@ export default function Create() {
                                         ))}
                                         <Button variant="outline" className="w-full py-8 border-dashed border-2 hover:border-primary hover:text-primary transition-all text-slate-500 text-lg rounded-xl dark:border-slate-700 dark:hover:border-primary" onClick={addManualTerm}>
                                             <Plus className="mr-2 h-5 w-5" />
-                                            Add Card
+                                            {t("create.add_card")}
                                         </Button>
                                         <div className="flex justify-end pt-4 sticky bottom-6 z-10">
                                             <Button className="w-full md:w-auto min-w-[200px] h-12 text-lg font-bold rounded-xl shadow-xl shadow-primary/20" size="lg" onClick={handleSave}>
-                                                Save & Create
+                                                {t("create.save_button")}
                                             </Button>
                                         </div>
                                     </div>

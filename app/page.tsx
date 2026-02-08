@@ -3,8 +3,11 @@
 
 import { Navbar } from "@/components/Navbar"
 import Link from "next/link"
+import { useLanguage } from "@/lib/i18n"
 
 export default function Home() {
+  const { t } = useLanguage()
+
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       {/* Background Ambient Glows */}
@@ -25,25 +28,25 @@ export default function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              New: AI Tutor v2.0 Live
+              {t("common.new_feature")}
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 max-w-4xl">
-              Learn Anything, <br className="hidden md:block" />
-              <span className="text-gradient">Powered by AI</span>
+              {t("landing.hero_title")} <br className="hidden md:block" />
+              <span className="text-gradient hover:animate-pulse transition-all cursor-default">{t("landing.hero_subtitle")}</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mb-10 leading-relaxed">
-              Unlock your potential with personalized learning paths, instant feedback, and quizzes generated just for you. Master any subject 10x faster.
+              {t("landing.hero_desc")}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <Link href="/dashboard" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base md:text-lg font-bold shadow-xl shadow-primary/25 transition-all hover:-translate-y-1">
-                <span className="mr-2">Get Started for Free</span>
+              <Link href="/dashboard" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base md:text-lg font-bold shadow-xl shadow-primary/25 transition-all hover:-translate-y-1 hover:shadow-primary/40">
+                <span className="mr-2">{t("landing.get_started")}</span>
                 <span className="material-symbols-outlined">rocket_launch</span>
               </Link>
-              <Link href="/dashboard" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-slate-700 hover:border-primary/50 text-slate-900 dark:text-white text-base md:text-lg font-bold transition-all hover:-translate-y-1">
-                <span className="mr-2">View Demo</span>
+              <Link href="/demo" className="flex h-12 md:h-14 px-8 items-center justify-center rounded-xl bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-slate-700 hover:border-primary/50 text-slate-900 dark:text-white text-base md:text-lg font-bold transition-all hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5">
+                <span className="mr-2">{t("landing.view_demo")}</span>
                 <span className="material-symbols-outlined">play_circle</span>
               </Link>
             </div>
@@ -51,22 +54,27 @@ export default function Home() {
             {/* Hero Visual / Dashboard Preview */}
             <div className="mt-16 w-full max-w-5xl relative group perspective-1000">
               <div className="absolute -inset-1 bg-linear-to-r from-primary via-blue-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative rounded-2xl bg-slate-900/50 backdrop-blur-xl border border-slate-700 overflow-hidden shadow-2xl">
-                {/* Placeholder for dashboard UI */}
-                <div
-                  className="aspect-video w-full bg-cover bg-center"
-                  style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYrTC_3JvqGtb_LxgrczRTuj440FbxKWOFH-xHbbJY301YA_IFg-jEALOvMRyJh_H5O9H3FOo1k2aYfFbC6mM5riTHESh_PJKOjZBAkNBHb6XoeyFyj4YEbbyANJqdduY_CunKKBwo9puQDxWFmwV-RV4sRH8Stounzg6201o4SEScYYbk17_7MfBPHFVTPbR7MhhB64GaDn50GVSl2SL686xzaaJabrrRna1NvC_YyMDkEVhkPO5uJRK5IlXWia3fiTKD8BELF7qd")' }}
-                >
+              <div className="relative rounded-2xl bg-slate-900/50 backdrop-blur-xl border border-slate-700 overflow-hidden shadow-2xl transition-transform duration-500 group-hover:rotate-x-2">
+                {/* Placeholder for dashboard UI with overlay */}
+                <div className="aspect-video w-full bg-slate-800 relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-500">
+                    <span className="material-symbols-outlined text-6xl opacity-20">dashboard</span>
+                  </div>
+                  {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-linear-to-t from-background-dark via-transparent to-transparent opacity-80"></div>
-                  <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 text-left">
-                    <div className="glass-panel inline-block p-4 rounded-xl max-w-md animate-pulse">
+
+                  {/* Floating Assistant Message */}
+                  <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 text-left pointer-events-none">
+                    <div className="glass-panel inline-block p-4 rounded-xl max-w-md animate-float">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="size-6 rounded-full bg-primary flex items-center justify-center">
+                        <div className="size-6 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
                           <span className="material-symbols-outlined text-[14px] text-white">smart_toy</span>
                         </div>
-                        <span className="text-xs font-bold text-slate-300">StudyFlow Assistant</span>
+                        <span className="text-xs font-bold text-slate-300">StudyFlow AI</span>
                       </div>
-                      <p className="text-sm text-white">I&apos;ve analyzed your recent quiz on Quantum Physics. You&apos;re strong on &quot;Wave functions&quot; but could use a refresher on &quot;Entanglement&quot;. Shall we start a mini-lesson?</p>
+                      <p className="text-sm text-white/90 leading-relaxed">
+                        {t("landing.ai_assistant_message")}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -75,12 +83,12 @@ export default function Home() {
 
             {/* Social Proof */}
             <div className="mt-16 text-center">
-              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest mb-6">Trusted by learners from top institutions</p>
+              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest mb-6">{t("landing.trusted_by")}</p>
               <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                <span className="text-xl font-bold font-display text-slate-400">MIT</span>
-                <span className="text-xl font-bold font-display text-slate-400">Stanford</span>
-                <span className="text-xl font-bold font-display text-slate-400">Harvard</span>
-                <span className="text-xl font-bold font-display text-slate-400">Berkeley</span>
+                <span className="text-xl font-bold font-display text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-default">MIT</span>
+                <span className="text-xl font-bold font-display text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-default">Stanford</span>
+                <span className="text-xl font-bold font-display text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-default">Harvard</span>
+                <span className="text-xl font-bold font-display text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-default">Berkeley</span>
               </div>
             </div>
           </div>
@@ -90,65 +98,42 @@ export default function Home() {
         <section className="py-20 px-4 md:px-10 relative">
           <div className="max-w-7xl mx-auto">
             <div className="mb-16 md:text-center max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight">Supercharge Your Learning</h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400">Experience the future of education with our cutting-edge AI tools designed to help you master any subject faster and retain more.</p>
+              <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight text-slate-900 dark:text-white">{t("landing.features_title")}</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400">{t("landing.features_desc")}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
               {/* Feature 1 */}
-              <div className="glass-panel p-8 rounded-2xl flex flex-col gap-6 hover:bg-slate-800/50 transition-colors group border-t-4 border-t-primary">
-                <div className="size-14 rounded-xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+              <div className="glass-panel p-8 rounded-2xl flex flex-col gap-6 hover:bg-slate-800/50 transition-colors group border-t-4 border-t-primary hover:-translate-y-1 duration-300">
+                <div className="size-14 rounded-xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/10">
                   <span className="material-symbols-outlined text-3xl">quiz</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-white">AI Quiz Maker</h3>
-                  <p className="text-slate-400 leading-relaxed">Turn any text, article, PDF, or YouTube video into a comprehensive quiz in seconds. Test your knowledge instantly.</p>
-                </div>
-                <div className="mt-auto pt-4">
-                  <div className="h-32 w-full rounded-lg overflow-hidden relative">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
-                      style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBxFSzE2nTtGJ730180oXuUc2V5Br5CbCF3NPhB6a_Qk0vDQws5JzCJGtFUIQJuTr-wjhy48EzcY_EXsdB0zU7yDznBsNKHbkCawUR9dPXkpIl9JA88W15hnrarLxgUBXie1kmZ3y1HVLb6M1FGUaunVezsNH_uvyZr549GZYsT0aJxiN2s7C1VNC8u_r5xKwIfj_w0Hh5gJQPqhkq_8s5hgWNFNViQIbOySbxuO7Arlw4csKjCGFRN2mueiE_jCMV4ZIMYC6f2XTwr")' }}
-                    ></div>
-                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-white">{t("landing.feature_1_title")}</h3>
+                  <p className="text-slate-400 leading-relaxed">{t("landing.feature_1_desc")}</p>
                 </div>
               </div>
 
               {/* Feature 2 */}
-              <div className="glass-panel p-8 rounded-2xl flex flex-col gap-6 hover:bg-slate-800/50 transition-colors group border-t-4 border-t-blue-500">
-                <div className="size-14 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+              <div className="relative z-10 p-8 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 backdrop-blur-sm h-full hover:bg-white/10 transition-colors group overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-violet-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-3xl">psychology_alt</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-white">Smart Explanations</h3>
-                  <p className="text-slate-400 leading-relaxed">Stuck on a difficult concept? Get instant, simplified breakdowns, analogies, and examples tailored to your level.</p>
-                </div>
-                <div className="mt-auto pt-4">
-                  <div className="h-32 w-full rounded-lg overflow-hidden relative">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
-                      style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmfraApMO97qaqBmwZ-wMMk8DuRXD64PAWmFtAvY-7veAW9WKvdkNMn1_UAx5zVuwwMipD3OnGErcvupDV4fepWh5MFtIlnQgNtFrq7t0XMsje37YydKWzeagdbEDgOMn9iibhFoWyJgieo__G7p9UPzR2QadeNgUTfSNWEYp0Hx6dt5qumU20ngqOigzHbjs0PaRvKrB9t1CKUk8cu1NqBgBkEADI-nX8AIz9rAMiKSoUaJSnCZQEweG2sBSVaPk-YlK3teJ_qDaW")' }}
-                    ></div>
-                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-white">{t("landing.feature_2_title")}</h3>
+                  <p className="text-slate-400 leading-relaxed">{t("landing.feature_2_desc")}</p>
                 </div>
               </div>
 
               {/* Feature 3 */}
-              <div className="glass-panel p-8 rounded-2xl flex flex-col gap-6 hover:bg-slate-800/50 transition-colors group border-t-4 border-t-purple-500">
-                <div className="size-14 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform duration-300">
+              <div className="glass-panel p-8 rounded-2xl flex flex-col gap-6 hover:bg-slate-800/50 transition-colors group border-t-4 border-t-purple-500 hover:-translate-y-1 duration-300">
+                <div className="size-14 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/10">
                   <span className="material-symbols-outlined text-3xl">trending_up</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-white">Adaptive Learning</h3>
-                  <p className="text-slate-400 leading-relaxed">A dynamic curriculum that evolves in real-time. The AI identifies your weak spots and adjusts future lessons automatically.</p>
-                </div>
-                <div className="mt-auto pt-4">
-                  <div className="h-32 w-full rounded-lg overflow-hidden relative">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500"
-                      style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAGG7s5jNHsosjGbg88EyEE4ncQuQY4uYnG72vmupQHVSkp9mlhGhwmyJUHnjhq1sT3zyxluZOOltNzxJQVrYWTYZGGyltlpXQXdLap3wl4qhdinClR94E4oPhgmeBCIc1nf4_oApykw2FzJMJR0G9nbxp_Fdph2H5FaWaJCGvdzYM9tJJH1wXNDMPYHBPHOkcrhmKg9MM5J98EqGtfHFchXWOd54uhk6283TyydmB16d5JFIOWjo68jTXYr3k-mchmmrCx_CJPRgam")' }}
-                    ></div>
-                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-white">{t("landing.feature_3_title")}</h3>
+                  <p className="text-slate-400 leading-relaxed">{t("landing.feature_3_desc")}</p>
                 </div>
               </div>
             </div>
@@ -157,17 +142,16 @@ export default function Home() {
 
         {/* Large Visual Breaker */}
         <section className="w-full py-10 px-4">
-          <div className="max-w-7xl mx-auto rounded-3xl overflow-hidden relative h-[400px] md:h-[500px] flex items-center justify-center">
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKEAbkPcl7yGQeHiCM3tUrtcdrW0zK71fPVkOcMjNE8kUyLsHbb43NrJtC7eTK9jV0Ou34zEr1hisHv9p43m2kBwBy-pbj3RuJ6acnChaPxcDiWOJED0OKd1azdQ8uYPRe1zlTQ-UUT8WXTMMII5LeCcN6kOQlDH-kPuoMROffTmqxMCBVjFHPcWQSDYyXTgubPhNwd0GkweyGIC0MFGsdmhDwf7IpCX_ft7iAbS6-GnV_t_J1bpbCb5H2BPGrVd9JXVisqG22Fm6r")' }}
-            ></div>
-            <div className="absolute inset-0 bg-linear-to-r from-background-dark/90 to-background-dark/40"></div>
+          <div className="max-w-7xl mx-auto rounded-3xl overflow-hidden relative h-[400px] md:h-[500px] flex items-center justify-center group">
+            {/* Abstract Background instead of Image */}
+            <div className="absolute inset-0 bg-linear-to-br from-indigo-900 via-slate-900 to-black"></div>
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+
             <div className="relative z-10 max-w-2xl text-center md:text-left md:mr-auto md:ml-20 px-6">
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-6">Learning is better together.</h2>
-              <p className="text-lg text-slate-300 mb-8">Share your AI-generated quizzes with friends, challenge them to beat your score, and learn collaboratively.</p>
-              <button className="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors">
-                Explore Community Features
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 drop-shadow-lg">{t("landing.community_title")}</h2>
+              <p className="text-lg text-slate-300 mb-8 drop-shadow-md">{t("landing.community_desc")}</p>
+              <button className="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-slate-100 transition-all hover:scale-105 shadow-xl">
+                {t("landing.community_button")}
               </button>
             </div>
           </div>
@@ -176,21 +160,21 @@ export default function Home() {
         {/* CTA Section */}
         <section className="py-20 px-4 md:px-10 relative overflow-hidden">
           {/* Background Decoration */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[100px] pointer-events-none animate-pulse-slow"></div>
 
-          <div className="max-w-4xl mx-auto text-center relative z-10 glass-panel border border-slate-700 p-10 md:p-16 rounded-3xl">
-            <span className="material-symbols-outlined text-6xl text-primary mb-6">verified</span>
-            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">Ready to start your journey?</h2>
-            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">Join thousands of learners mastering new skills every day with Lumina AI. No credit card required to start.</p>
+          <div className="max-w-4xl mx-auto text-center relative z-10 glass-panel border border-slate-700 p-10 md:p-16 rounded-3xl shadow-2xl">
+            <span className="material-symbols-outlined text-6xl text-primary mb-6 animate-bounce-slow">verified</span>
+            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-white">{t("landing.cta_title")}</h2>
+            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">{t("landing.cta_desc")}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="flex h-12 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base font-bold transition-all hover:shadow-lg hover:shadow-primary/40">
-                Get Started for Free
+              <Link href="/signup" className="flex h-12 px-8 items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white text-base font-bold transition-all hover:shadow-lg hover:shadow-primary/40 hover:-translate-y-1">
+                {t("landing.get_started")}
               </Link>
-              <button className="flex h-12 px-8 items-center justify-center rounded-xl bg-transparent border border-slate-600 hover:border-white text-white text-base font-bold transition-all">
-                View Pricing
+              <button className="flex h-12 px-8 items-center justify-center rounded-xl bg-transparent border border-slate-600 hover:border-white text-white text-base font-bold transition-all hover:-translate-y-1">
+                {t("landing.view_pricing")}
               </button>
             </div>
-            <p className="mt-6 text-sm text-slate-500">Free 14-day trial on Pro plans. Cancel anytime.</p>
+            <p className="mt-6 text-sm text-slate-500">{t("landing.trial_text")}</p>
           </div>
         </section>
       </main>
@@ -203,13 +187,12 @@ export default function Home() {
             <span className="font-bold text-white text-lg">StudyFlow</span>
           </div>
           <div className="flex gap-8 flex-wrap justify-center">
-            <a className="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-            <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
-            <a className="hover:text-primary transition-colors" href="#">Support</a>
-            <a className="hover:text-primary transition-colors" href="#">Twitter</a>
+            <a className="hover:text-primary transition-colors" href="#">{t("common.privacy")}</a>
+            <a className="hover:text-primary transition-colors" href="#">{t("common.terms")}</a>
+            <a className="hover:text-primary transition-colors" href="#">{t("common.support")}</a>
           </div>
           <div>
-            © 2023 StudyFlow Inc.
+            © 2024 StudyFlow Inc.
           </div>
         </div>
       </footer>
