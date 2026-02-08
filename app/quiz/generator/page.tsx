@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/Textarea"
 import { Select } from "@/components/ui/Select"
 import { saveQuiz } from "@/lib/quizStore"
 
+import { LANGUAGES } from "@/lib/constants"
+
 // Options for selects
 const difficultyOptions = [
   { value: "Beginner", label: "Beginner" },
@@ -31,23 +33,7 @@ const questionCountOptions = [
   { value: "25", label: "25 Questions" },
 ]
 
-const languageOptions = [
-  { value: "English", label: "English" },
-  { value: "Spanish", label: "Español" },
-  { value: "French", label: "Français" },
-  { value: "German", label: "Deutsch" },
-  { value: "Portuguese", label: "Português" },
-  { value: "Italian", label: "Italiano" },
-  { value: "Dutch", label: "Nederlands" },
-  { value: "Russian", label: "Русский" },
-  { value: "Chinese", label: "中文" },
-  { value: "Japanese", label: "日本語" },
-  { value: "Korean", label: "한국어" },
-  { value: "Arabic", label: "العربية" },
-  { value: "Hindi", label: "हिन्दी" },
-  { value: "Turkish", label: "Türkçe" },
-  { value: "Polish", label: "Polski" },
-]
+const languageOptions = LANGUAGES as any
 
 const aiModeOptions = [
   { value: "fast", label: "⚡ Fast", description: "Quick generation, best for simple topics" },
@@ -204,8 +190,8 @@ export default function QuizGenerator() {
                     type="button"
                     onClick={() => setAiMode(mode.value)}
                     className={`p-4 rounded-xl border-2 transition-all text-left ${aiMode === mode.value
-                        ? 'border-primary bg-primary/10 dark:bg-primary/20'
-                        : 'border-slate-200 dark:border-[#3a3347] hover:border-primary/50'
+                      ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                      : 'border-slate-200 dark:border-[#3a3347] hover:border-primary/50'
                       }`}
                   >
                     <p className={`font-semibold ${aiMode === mode.value ? 'text-primary' : 'text-slate-900 dark:text-white'}`}>

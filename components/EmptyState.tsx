@@ -8,6 +8,7 @@ interface EmptyStateProps {
     description: string
     actionLabel?: string
     actionHref?: string
+    onAction?: () => void
     className?: string
 }
 
@@ -17,6 +18,7 @@ export function EmptyState({
     description,
     actionLabel,
     actionHref,
+    onAction,
     className = ""
 }: EmptyStateProps) {
     return (
@@ -30,14 +32,24 @@ export function EmptyState({
             <p className="text-sm text-slate-500 dark:text-[#a69db9] max-w-sm mb-6">
                 {description}
             </p>
-            {actionLabel && actionHref && (
-                <Link
-                    href={actionHref}
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
-                >
-                    <span className="material-symbols-outlined text-lg">add</span>
-                    {actionLabel}
-                </Link>
+            {actionLabel && (
+                actionHref ? (
+                    <Link
+                        href={actionHref}
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
+                    >
+                        <span className="material-symbols-outlined text-lg">add</span>
+                        {actionLabel}
+                    </Link>
+                ) : onAction ? (
+                    <button
+                        onClick={onAction}
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
+                    >
+                        <span className="material-symbols-outlined text-lg">arrow_back</span>
+                        {actionLabel}
+                    </button>
+                ) : null
             )}
         </div>
     )

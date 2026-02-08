@@ -7,19 +7,19 @@ import { getUserProfile } from "@/lib/userStore"
 import { EmptyState } from "@/components/EmptyState"
 import { Select } from "@/components/ui/Select"
 import { useState } from "react"
-
-// Language options for select
-const languageOptions = [
-  { value: "en-US", label: "English (US)" },
-  { value: "es", label: "Spanish" },
-  { value: "fr", label: "French" },
-  { value: "de", label: "German" },
-]
+import { LANGUAGES } from "@/lib/constants"
+import { useRouter } from "next/navigation"
 
 export default function Profile() {
   const { data: session } = useSession()
+  const router = useRouter()
   const userProfile = getUserProfile()
-  const [language, setLanguage] = useState("en-US")
+
+  // State for tabs and settings
+  const [activeTab, setActiveTab] = useState("overview")
+  const [language, setLanguage] = useState("English")
+  const [darkMode, setDarkMode] = useState(true)
+  const [emailNotifications, setEmailNotifications] = useState(true)
 
   // Combine session and stored profile data
   const displayName = userProfile?.name || session?.user?.name || "Guest User"
@@ -31,8 +31,181 @@ export default function Profile() {
   const stats = userProfile?.stats
 
   // Check if user has any learning content (empty for new users)
-  const hasLearningContent = false // Would come from actual data
-  const hasBookmarks = false // Would come from actual data
+  const hasLearningContent = false
+  const hasBookmarks = false
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return (
+          <div className="space-y-8 animate-fade-in">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-1">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <span className="material-symbols-outlined text-6xl text-primary">quiz</span>
+                </div>
+                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Total Quizzes</p>
+                <div className="flex items-baseline gap-3 mt-1">
+                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.totalQuizzes || 0}</p>
+                </div>
+                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">
+                  {(stats?.totalQuizzes || 0) === 0 ? "Take your first quiz!" : "Keep learning!"}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-2">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <span className="material-symbols-outlined text-6xl text-primary">target</span>
+                </div>
+                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Accuracy Score</p>
+                <div className="flex items-baseline gap-3 mt-1">
+                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.accuracyScore || 0}%</p>
+                </div>
+                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">
+                  {(stats?.accuracyScore || 0) === 0 ? "Complete quizzes to track accuracy" : "Keep improving!"}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-3">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <span className="material-symbols-outlined text-6xl text-primary">schedule</span>
+                </div>
+                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Hours Studied</p>
+                <div className="flex items-baseline gap-3 mt-1">
+                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.hoursStudied || 0}h</p>
+                </div>
+                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">Daily streak: {stats?.dailyStreak || 0} days</p>
+              </div>
+            </div>
+
+            {/* Recent Activity Section */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-slate-900 dark:text-white text-xl font-bold">Continue Learning</h3>
+                {hasLearningContent && (
+                  <Link className="text-primary text-sm font-medium hover:underline" href="#">View All</Link>
+                )}
+              </div>
+
+              {hasLearningContent ? (
+                <div className="space-y-3">
+                  {/* Content would be rendered here when user has data */}
+                </div>
+              ) : (
+                <div className="rounded-2xl bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347]">
+                  <EmptyState
+                    icon="school"
+                    title="Nothing to continue"
+                    description="Start a quiz or course to track your progress here."
+                    actionLabel="Generate Quiz"
+                    actionHref="/quiz/generator"
+                  />
+                </div>
+              )}
+            </section>
+          </div>
+        )
+      case "settings":
+        return (
+          <div className="space-y-8 animate-fade-in">
+            <section className="bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] rounded-2xl p-6">
+              <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-6">Preferences</h3>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
+                      <span className="material-symbols-outlined">dark_mode</span>
+                    </div>
+                    <div>
+                      <p className="text-slate-900 dark:text-white font-medium">Dark Mode</p>
+                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Adjust the appearance of the app</p>
+                    </div>
+                  </div>
+                  {/* Toggle Switch */}
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={darkMode}
+                      onChange={() => setDarkMode(!darkMode)}
+                    />
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-[#1a1622] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[#3a3347] peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+                <div className="h-px bg-slate-200 dark:bg-[#3a3347] w-full"></div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
+                      <span className="material-symbols-outlined">notifications</span>
+                    </div>
+                    <div>
+                      <p className="text-slate-900 dark:text-white font-medium">Email Notifications</p>
+                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Receive daily summary and study reminders</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={emailNotifications}
+                      onChange={() => setEmailNotifications(!emailNotifications)}
+                    />
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-[#1a1622] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[#3a3347] peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+                <div className="h-px bg-slate-200 dark:bg-[#3a3347] w-full"></div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
+                      <span className="material-symbols-outlined">language</span>
+                    </div>
+                    <div>
+                      <p className="text-slate-900 dark:text-white font-medium">Language</p>
+                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Select your preferred language</p>
+                    </div>
+                  </div>
+                  <div className="w-40">
+                    <Select
+                      options={LANGUAGES as any}
+                      value={language}
+                      onChange={setLanguage}
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Danger Zone */}
+            <section className="opacity-80">
+              <h3 className="text-red-500 dark:text-red-400 text-sm font-bold uppercase tracking-wider mb-3">Danger Zone</h3>
+              <div className="border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-slate-900 dark:text-white font-medium">Delete Account</p>
+                  <p className="text-slate-500 dark:text-[#a69db9] text-sm">Permanently delete your account and all data.</p>
+                </div>
+                <button
+                  onClick={() => confirm("Are you sure? This action cannot be undone.")}
+                  className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 px-4 py-2 rounded-xl font-medium transition-colors text-sm"
+                >
+                  Delete Account
+                </button>
+              </div>
+            </section>
+          </div>
+        )
+      default:
+        return (
+          <div className="flex items-center justify-center py-20">
+            <EmptyState
+              icon="construction"
+              title="Coming Soon"
+              description="This section is currently under development."
+              actionLabel="Go Back"
+              onAction={() => setActiveTab("overview")}
+            />
+          </div>
+        )
+    }
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
@@ -55,8 +228,11 @@ export default function Profile() {
             <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-[#2e2839] dark:text-white dark:hover:bg-[#3a3347]">
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-[#2e2839] dark:text-white dark:hover:bg-[#3a3347]">
-              <span className="material-symbols-outlined">dark_mode</span>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-[#2e2839] dark:text-white dark:hover:bg-[#3a3347]"
+            >
+              <span className="material-symbols-outlined">{darkMode ? "dark_mode" : "light_mode"}</span>
             </button>
             <div className="h-8 w-8 overflow-hidden rounded-full md:hidden">
               <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
@@ -108,180 +284,64 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-1">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <span className="material-symbols-outlined text-6xl text-primary">quiz</span>
-                </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Total Quizzes</p>
-                <div className="flex items-baseline gap-3 mt-1">
-                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.totalQuizzes || 0}</p>
-                </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">
-                  {(stats?.totalQuizzes || 0) === 0 ? "Take your first quiz!" : "Keep learning!"}
-                </p>
-              </div>
-              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-2">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <span className="material-symbols-outlined text-6xl text-primary">target</span>
-                </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Accuracy Score</p>
-                <div className="flex items-baseline gap-3 mt-1">
-                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.accuracyScore || 0}%</p>
-                </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">
-                  {(stats?.accuracyScore || 0) === 0 ? "Complete quizzes to track accuracy" : "Keep improving!"}
-                </p>
-              </div>
-              <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-3">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <span className="material-symbols-outlined text-6xl text-primary">schedule</span>
-                </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-sm font-medium uppercase tracking-wider">Hours Studied</p>
-                <div className="flex items-baseline gap-3 mt-1">
-                  <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.hoursStudied || 0}h</p>
-                </div>
-                <p className="text-slate-500 dark:text-[#a69db9] text-xs mt-2">Daily streak: {stats?.dailyStreak || 0} days</p>
-              </div>
-            </div>
-
             {/* Main Content Split Layout */}
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Sidebar Tabs */}
               <aside className="w-full lg:w-64 shrink-0">
                 <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
-                  <a className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-medium border-l-4 border-primary transition-all whitespace-nowrap" href="#">
+                  <button
+                    onClick={() => setActiveTab("overview")}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "overview" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                  >
                     <span className="material-symbols-outlined">dashboard</span>
                     Overview
-                  </a>
-                  <a className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap group" href="#">
-                    <span className="material-symbols-outlined group-hover:text-slate-900 dark:group-hover:text-white transition-colors">history</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("history")}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "history" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                  >
+                    <span className="material-symbols-outlined">history</span>
                     History
-                  </a>
-                  <a className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap group" href="#">
-                    <span className="material-symbols-outlined group-hover:text-slate-900 dark:group-hover:text-white transition-colors">bookmark</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("bookmarks")}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "bookmarks" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                  >
+                    <span className="material-symbols-outlined">bookmark</span>
                     Bookmarks
                     {hasBookmarks && (
                       <span className="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
                     )}
-                  </a>
-                  <a className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap group" href="#">
-                    <span className="material-symbols-outlined group-hover:text-slate-900 dark:group-hover:text-white transition-colors">folder_special</span>
+                  </button>
+                  <Link
+                    href="/quizzes"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap"
+                  >
+                    <span className="material-symbols-outlined">folder_special</span>
                     Saved Quizzes
-                  </a>
+                  </Link>
                   <div className="h-px bg-slate-200 dark:bg-[#3a3347] my-2 hidden lg:block"></div>
                   <p className="text-xs font-semibold text-slate-500 dark:text-[#a69db9] uppercase tracking-wider px-4 py-2 hidden lg:block">Settings</p>
-                  <a className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap group" href="#">
-                    <span className="material-symbols-outlined group-hover:text-slate-900 dark:group-hover:text-white transition-colors">settings</span>
+                  <button
+                    onClick={() => setActiveTab("settings")}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "settings" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                  >
+                    <span className="material-symbols-outlined">settings</span>
                     App Settings
-                  </a>
-                  <a className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap group" href="#">
-                    <span className="material-symbols-outlined group-hover:text-slate-900 dark:group-hover:text-white transition-colors">credit_card</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("subscription")}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "subscription" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
+                  >
+                    <span className="material-symbols-outlined">credit_card</span>
                     Subscription
-                  </a>
+                  </button>
                 </nav>
               </aside>
 
               {/* Tab Content Area */}
-              <div className="flex-1 flex flex-col gap-8">
-                {/* Saved / Recent Section */}
-                <section>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-slate-900 dark:text-white text-xl font-bold">Continue Learning</h3>
-                    {hasLearningContent && (
-                      <Link className="text-primary text-sm font-medium hover:underline" href="#">View All</Link>
-                    )}
-                  </div>
-
-                  {hasLearningContent ? (
-                    <div className="space-y-3">
-                      {/* Content would be rendered here when user has data */}
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347]">
-                      <EmptyState
-                        icon="school"
-                        title="Nothing to continue"
-                        description="Start a quiz or course to track your progress here."
-                        actionLabel="Generate Quiz"
-                        actionHref="/quiz/generator"
-                      />
-                    </div>
-                  )}
-                </section>
-
-                {/* Settings Panel */}
-                <section className="bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] rounded-2xl p-6">
-                  <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-6">Preferences</h3>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
-                          <span className="material-symbols-outlined">dark_mode</span>
-                        </div>
-                        <div>
-                          <p className="text-slate-900 dark:text-white font-medium">Dark Mode</p>
-                          <p className="text-slate-500 dark:text-[#a69db9] text-sm">Adjust the appearance of the app</p>
-                        </div>
-                      </div>
-                      {/* Toggle Switch */}
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-slate-200 dark:bg-[#1a1622] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[#3a3347] peer-checked:bg-primary"></div>
-                      </label>
-                    </div>
-                    <div className="h-px bg-slate-200 dark:bg-[#3a3347] w-full"></div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
-                          <span className="material-symbols-outlined">notifications</span>
-                        </div>
-                        <div>
-                          <p className="text-slate-900 dark:text-white font-medium">Email Notifications</p>
-                          <p className="text-slate-500 dark:text-[#a69db9] text-sm">Receive daily summary and study reminders</p>
-                        </div>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-slate-200 dark:bg-[#1a1622] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[#3a3347] peer-checked:bg-primary"></div>
-                      </label>
-                    </div>
-                    <div className="h-px bg-slate-200 dark:bg-[#3a3347] w-full"></div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1a1622] text-slate-500 dark:text-[#a69db9]">
-                          <span className="material-symbols-outlined">language</span>
-                        </div>
-                        <div>
-                          <p className="text-slate-900 dark:text-white font-medium">Language</p>
-                          <p className="text-slate-500 dark:text-[#a69db9] text-sm">Select your preferred language</p>
-                        </div>
-                      </div>
-                      <div className="w-40">
-                        <Select
-                          options={languageOptions}
-                          value={language}
-                          onChange={setLanguage}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                {/* Danger Zone */}
-                <section className="opacity-80">
-                  <h3 className="text-red-500 dark:text-red-400 text-sm font-bold uppercase tracking-wider mb-3">Danger Zone</h3>
-                  <div className="border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 rounded-2xl p-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-900 dark:text-white font-medium">Delete Account</p>
-                      <p className="text-slate-500 dark:text-[#a69db9] text-sm">Permanently delete your account and all data.</p>
-                    </div>
-                    <button className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 px-4 py-2 rounded-xl font-medium transition-colors text-sm">
-                      Delete Account
-                    </button>
-                  </div>
-                </section>
+              <div className="flex-1">
+                {renderContent()}
               </div>
             </div>
           </div>
