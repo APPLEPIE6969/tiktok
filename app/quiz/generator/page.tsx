@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation"
 import { Textarea } from "@/components/ui/Textarea"
 import { Select } from "@/components/ui/Select"
 import { saveQuiz } from "@/lib/quizStore"
-
+import { useLanguage } from "@/lib/i18n"
 import { LANGUAGES } from "@/lib/constants"
+
 // Options for selects
 const difficultyOptions = [
   { value: "Beginner", label: "Beginner" },
@@ -45,13 +46,19 @@ export default function QuizGenerator() {
   const [difficulty, setDifficulty] = useState("Intermediate")
   const [questionType, setQuestionType] = useState("Multiple Choice")
   const [questionCount, setQuestionCount] = useState("recommended")
-  const [language, setLanguage] = useState("English")
+  const [language, setLanguageState] = useState("English")
   const [aiMode, setAiMode] = useState("balanced")
   const [instantFeedback, setInstantFeedback] = useState(true)
   const [customContent, setCustomContent] = useState("")
   const [showCustomContent, setShowCustomContent] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const router = useRouter()
+  const { t, language: appLanguage } = useLanguage()
+
+  // Sync with app language
+  useEffect(() => {
+    setLanguageState(appLanguage)
+  }, [appLanguage])
 
   useEffect(() => {
     // Load persisted language
@@ -60,7 +67,7 @@ export default function QuizGenerator() {
       try {
         const profile = JSON.parse(savedProfile);
         if (profile.language) {
-          setLanguage(profile.language);
+          setLanguageState(profile.language);
         }
       } catch (e) {
         console.error("Failed to parse user profile", e);
@@ -124,8 +131,8 @@ export default function QuizGenerator() {
         <div className="w-full max-w-[800px] flex flex-col gap-6 animate-fade-in-up">
           {/* Header */}
           <div className="text-center space-y-2 mb-4">
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">AI Quiz Generator</h1>
-            <p className="text-slate-500 dark:text-[#a69db9] text-base md:text-lg">Create a personalized quiz in seconds from any topic.</p>
+            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t("quiz.title")}</h1>
+            <p className="text-slate-500 dark:text-[#a69db9] text-base md:text-lg">{t("quiz.subtitle")}</p>
           </div>
 
           {/* Main Card */}
@@ -133,10 +140,10 @@ export default function QuizGenerator() {
 
             {/* Topic Input */}
             <div className="flex flex-col gap-2">
-              <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Topic or Subject</label>
+              <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">{t("quiz.topic_label")}</label>
               <div className="relative group">
                 <Textarea
-                  placeholder="e.g., Quantum Physics, World War II, Machine Learning basics..."
+                  placeholder={t("quiz.topic_placeholder")}
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   className="h-28"
@@ -156,7 +163,7 @@ export default function QuizGenerator() {
                 <span className="material-symbols-outlined text-lg">
                   {showCustomContent ? 'expand_less' : 'add_circle'}
                 </span>
-                Add your own source material (optional)
+                {t("quiz.custom_content")}
               </button>
 
               {showCustomContent && (
@@ -177,26 +184,26 @@ export default function QuizGenerator() {
             {/* Configuration Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Difficulty Level</label>
+                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">{t("quiz.difficulty")}</label>
                 <Select options={difficultyOptions} value={difficulty} onChange={setDifficulty} />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Question Type</label>
+                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">{t("quiz.question_type")}</label>
                 <Select options={questionTypeOptions} value={questionType} onChange={setQuestionType} />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Number of Questions</label>
+                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">{t("quiz.question_count")}</label>
                 <Select options={questionCountOptions} value={questionCount} onChange={setQuestionCount} />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Language</label>
-                <Select options={languageOptions} value={language} onChange={setLanguage} />
+                <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">{t("quiz.language")}</label>
+                <Select options={languageOptions} value={language} onChange={setLanguageState} />
               </div>
             </div>
 
             {/* AI Mode Selection */}
             <div className="border-t border-slate-200 dark:border-[#3a3347] pt-6">
-              <label className="text-slate-900 dark:text-white text-sm font-bold ml-1 block mb-3">AI Mode</label>
+              <label className="text-slate-900 dark:text-white text-sm font-bold ml-1 block mb-3">{t("quiz.ai_mode")}</label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {aiModeOptions.map((mode) => (
                   <button
@@ -224,7 +231,7 @@ export default function QuizGenerator() {
                   <span className="material-symbols-outlined">feedback</span>
                 </div>
                 <div>
-                  <p className="text-slate-900 dark:text-white font-medium">Instant Feedback</p>
+                  <p className="text-slate-900 dark:text-white font-medium">{t("quiz.instant_feedback")}</p>
                   <p className="text-slate-500 dark:text-[#a69db9] text-sm">See correct answers after each question</p>
                 </div>
               </div>
@@ -252,7 +259,7 @@ export default function QuizGenerator() {
                 ) : (
                   <span className="material-symbols-outlined relative z-10">auto_awesome</span>
                 )}
-                <span className="relative z-10">{isGenerating ? "Generating..." : "Generate Quiz"}</span>
+                <span className="relative z-10">{isGenerating ? t("quiz.generating") : t("quiz.generate_button")}</span>
               </button>
               <p className="text-center text-xs text-slate-400 dark:text-[#a69db9]/60 mt-3">
                 {aiMode === "smart" ? "~20 seconds" : aiMode === "balanced" ? "~10 seconds" : "~5 seconds"}

@@ -5,22 +5,25 @@ import { usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { getUserProfile } from "@/lib/userStore"
 
+import { useLanguage } from "@/lib/i18n"
+
 const sidebarItems = [
-  { name: "Dashboard", href: "/dashboard", icon: "dashboard" },
-  { name: "My Courses", href: "/courses", icon: "menu_book" },
-  { name: "Quizzes", href: "/quiz/generator", icon: "quiz" },
-  { name: "AI Tutor", href: "/study/explanation", icon: "psychology" },
-  { name: "Resources", href: "/resources", icon: "folder_open" },
+  { name: "nav.dashboard", href: "/dashboard", icon: "dashboard" },
+  { name: "nav.courses", href: "/courses", icon: "menu_book" },
+  { name: "nav.quizzes", href: "/quiz/generator", icon: "quiz" },
+  { name: "nav.tutor", href: "/study/explanation", icon: "psychology" },
+  { name: "nav.resources", href: "/resources", icon: "folder_open" },
 ]
 
 const settingsItems = [
-  { name: "Settings", href: "/profile", icon: "settings" },
+  { name: "nav.settings", href: "/profile", icon: "settings" },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const userProfile = getUserProfile()
+  const { t } = useLanguage()
 
   return (
     <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white dark:border-[#2e2839] dark:bg-[#131118] md:flex h-screen sticky top-0">
@@ -45,7 +48,7 @@ export function Sidebar() {
                   }`}
               >
                 <span className={`material-symbols-outlined ${isActive ? "fill" : ""}`}>{item.icon}</span>
-                <span className="text-sm font-medium">{item.name}</span>
+                <span className="text-sm font-medium">{t(item.name)}</span>
               </Link>
             )
           })}
@@ -64,7 +67,7 @@ export function Sidebar() {
                   }`}
               >
                 <span className="material-symbols-outlined">{item.icon}</span>
-                <span className="text-sm font-medium">{item.name}</span>
+                <span className="text-sm font-medium">{t(item.name)}</span>
               </Link>
             )
           })}

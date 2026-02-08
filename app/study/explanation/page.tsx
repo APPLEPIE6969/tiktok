@@ -4,6 +4,8 @@ import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { Sidebar } from "@/components/Sidebar"
 import { getUserProfile } from "@/lib/userStore"
+import { useLanguage } from "@/lib/i18n"
+import { VoiceInput } from "@/components/VoiceInput"
 
 type Message = {
   role: 'user' | 'ai'
@@ -24,6 +26,7 @@ export default function SmartExplanation() {
   const [loading, setLoading] = useState(false)
   const [selectedSubject, setSelectedSubject] = useState(SUBJECTS[0])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { t, language } = useLanguage()
 
   // Load chat history from local storage on mount
   useEffect(() => {
@@ -81,6 +84,43 @@ export default function SmartExplanation() {
     }
   };
 
+  const handleAudioSend = async (audioBlob: Blob) => {
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlob);
+      formData.append("history", JSON.stringify(chatHistory.slice(-6)));
+      formData.append("language", language);
+
+      const response = await fetch("/api/tutor/live", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Failed to get response");
+
+      const data = await response.json();
+
+      // If the model returned text, add it to history
+      if (data.text) {
+        setChatHistory(prev => [...prev, { role: 'ai', content: data.text }]);
+      }
+
+      // If audio, play it
+      if (data.audio) {
+        const audio = new Audio(`data:audio/wav;base64,${data.audio}`);
+        audio.play().catch(e => console.error("Audio playback failed", e));
+      }
+
+    } catch (error) {
+      console.error("Voice chat error", error);
+      setChatHistory(prev => [...prev, { role: 'ai', content: "Sorry, I had trouble processing your voice message." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleClearChat = () => {
     if (confirm("Are you sure you want to clear the chat history?")) {
       setChatHistory([]);
@@ -100,7 +140,7 @@ export default function SmartExplanation() {
               <span className="material-symbols-outlined">{selectedSubject.icon}</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">AI Tutor</h1>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t("nav.tutor")}</h1>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-500 dark:text-text-secondary">Subject:</span>
                 <select
@@ -119,7 +159,7 @@ export default function SmartExplanation() {
           <button
             onClick={handleClearChat}
             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
-            title="Clear Chat"
+            title={t("tutor.clear_chat")}
           >
             <span className="material-symbols-outlined">delete_sweep</span>
           </button>
@@ -132,9 +172,9 @@ export default function SmartExplanation() {
               <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
                 <span className="material-symbols-outlined text-5xl text-primary">school</span>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Hello! I'm your AI Tutor.</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t("tutor.welcome")}</h2>
               <p className="text-slate-500 dark:text-text-secondary max-w-md mb-8">
-                I can help you with {selectedSubject.name.toLowerCase()} questions, explain complex topics, or just chat about what you're learning.
+                {t("tutor.description")}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
@@ -191,31 +231,35 @@ export default function SmartExplanation() {
 
         {/* Input Area */}
         <div className="flex-none p-4 md:p-6 bg-white dark:bg-[#131118] border-t border-slate-200 dark:border-surface-dark-lighter">
-          <div className="relative max-w-4xl mx-auto">
-            <input
-              className="w-full bg-slate-100 dark:bg-[#0a0a0c] rounded-xl border border-transparent focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 px-4 py-4 pr-14 transition-all outline-none"
-              placeholder={`Ask your ${selectedSubject.name.toLowerCase()} question...`}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
-              disabled={loading}
-              autoFocus
-            />
-            <button
-              onClick={handleAsk}
-              disabled={loading || !query.trim()}
-              className="absolute right-2 top-2 bottom-2 p-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center aspect-square"
-            >
-              {loading ? (
-                <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
-              ) : (
-                <span className="material-symbols-outlined text-xl">send</span>
-              )}
-            </button>
+          <div className="relative max-w-4xl mx-auto flex items-end gap-2">
+            <div className="relative flex-1">
+              <input
+                className="w-full bg-slate-100 dark:bg-[#0a0a0c] rounded-xl border border-transparent focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 px-4 py-4 pr-14 transition-all outline-none"
+                placeholder={t("tutor.input_placeholder")}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
+                disabled={loading}
+                autoFocus
+              />
+              <button
+                onClick={handleAsk}
+                disabled={loading || !query.trim()}
+                className="absolute right-2 top-2 bottom-2 p-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center aspect-square"
+              >
+                {loading ? (
+                  <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
+                ) : (
+                  <span className="material-symbols-outlined text-xl">send</span>
+                )}
+              </button>
+            </div>
+
+            <VoiceInput onAudioSend={handleAudioSend} disabled={loading} />
           </div>
           <p className="text-center text-xs text-slate-400 dark:text-[#5f586b] mt-3">
-            AI can make mistakes. Verify important information.
+            {t("tutor.disclaimer")}
           </p>
         </div>
       </main>

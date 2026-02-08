@@ -10,25 +10,18 @@ import { useState, useEffect } from "react"
 import { LANGUAGES } from "@/lib/constants"
 import { useRouter } from "next/navigation"
 
+import { useLanguage } from "@/lib/i18n"
+
 export default function Profile() {
   const { data: session } = useSession()
   const router = useRouter()
   const userProfile = getUserProfile()
+  const { language, setLanguage, t } = useLanguage()
 
   // State for tabs and settings
   const [activeTab, setActiveTab] = useState("overview")
-  const [language, setLanguage] = useState("English") // Initialize with default, update in useEffect
   const [darkMode, setDarkMode] = useState(true)
   const [emailNotifications, setEmailNotifications] = useState(true)
-
-  // Load profile data on client mount
-  useEffect(() => {
-    const profile = getUserProfile()
-    if (profile) {
-      if (profile.language) setLanguage(profile.language)
-      // Load other preferences if they existed in profile
-    }
-  }, [])
 
   // Update language in user profile when changed
   const handleLanguageChange = (newLanguage: string) => {
@@ -129,7 +122,7 @@ export default function Profile() {
         return (
           <div className="space-y-8 animate-fade-in">
             <section className="bg-white dark:bg-[#2e2839] border border-slate-200 dark:border-[#3a3347] rounded-2xl p-6">
-              <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-6">Preferences</h3>
+              <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-6">{t("profile.preferences")}</h3>
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -137,7 +130,7 @@ export default function Profile() {
                       <span className="material-symbols-outlined">dark_mode</span>
                     </div>
                     <div>
-                      <p className="text-slate-900 dark:text-white font-medium">Dark Mode</p>
+                      <p className="text-slate-900 dark:text-white font-medium">{t("profile.theme")}</p>
                       <p className="text-slate-500 dark:text-[#a69db9] text-sm">Adjust the appearance of the app</p>
                     </div>
                   </div>
@@ -159,7 +152,7 @@ export default function Profile() {
                       <span className="material-symbols-outlined">notifications</span>
                     </div>
                     <div>
-                      <p className="text-slate-900 dark:text-white font-medium">Email Notifications</p>
+                      <p className="text-slate-900 dark:text-white font-medium">{t("profile.notifications")}</p>
                       <p className="text-slate-500 dark:text-[#a69db9] text-sm">Receive daily summary and study reminders</p>
                     </div>
                   </div>
@@ -180,7 +173,7 @@ export default function Profile() {
                       <span className="material-symbols-outlined">language</span>
                     </div>
                     <div>
-                      <p className="text-slate-900 dark:text-white font-medium">Language</p>
+                      <p className="text-slate-900 dark:text-white font-medium">{t("profile.language")}</p>
                       <p className="text-slate-500 dark:text-[#a69db9] text-sm">Select your preferred language</p>
                     </div>
                   </div>
@@ -200,14 +193,14 @@ export default function Profile() {
               <h3 className="text-red-500 dark:text-red-400 text-sm font-bold uppercase tracking-wider mb-3">Danger Zone</h3>
               <div className="border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 rounded-2xl p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-slate-900 dark:text-white font-medium">Delete Account</p>
+                  <p className="text-slate-900 dark:text-white font-medium">{t("profile.delete")}</p>
                   <p className="text-slate-500 dark:text-[#a69db9] text-sm">Permanently delete your account and all data.</p>
                 </div>
                 <button
                   onClick={() => confirm("Are you sure? This action cannot be undone.")}
                   className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 px-4 py-2 rounded-xl font-medium transition-colors text-sm"
                 >
-                  Delete Account
+                  {t("profile.delete")}
                 </button>
               </div>
             </section>
@@ -315,21 +308,21 @@ export default function Profile() {
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "overview" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
                   >
                     <span className="material-symbols-outlined">dashboard</span>
-                    Overview
+                    {t("nav.dashboard")}
                   </button>
                   <button
                     onClick={() => setActiveTab("history")}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "history" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
                   >
                     <span className="material-symbols-outlined">history</span>
-                    History
+                    {t("profile.history")}
                   </button>
                   <button
                     onClick={() => setActiveTab("bookmarks")}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "bookmarks" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
                   >
                     <span className="material-symbols-outlined">bookmark</span>
-                    Bookmarks
+                    {t("profile.bookmarks")}
                     {hasBookmarks && (
                       <span className="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
                     )}
@@ -339,23 +332,23 @@ export default function Profile() {
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839] transition-all whitespace-nowrap"
                   >
                     <span className="material-symbols-outlined">folder_special</span>
-                    Saved Quizzes
+                    {t("nav.quizzes")}
                   </Link>
                   <div className="h-px bg-slate-200 dark:bg-[#3a3347] my-2 hidden lg:block"></div>
-                  <p className="text-xs font-semibold text-slate-500 dark:text-[#a69db9] uppercase tracking-wider px-4 py-2 hidden lg:block">Settings</p>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-[#a69db9] uppercase tracking-wider px-4 py-2 hidden lg:block">{t("nav.settings")}</p>
                   <button
                     onClick={() => setActiveTab("settings")}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "settings" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
                   >
                     <span className="material-symbols-outlined">settings</span>
-                    App Settings
+                    {t("nav.settings")}
                   </button>
                   <button
                     onClick={() => setActiveTab("subscription")}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap text-left ${activeTab === "subscription" ? "bg-primary/10 text-primary font-medium border-l-4 border-primary" : "text-slate-500 dark:text-[#a69db9] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#2e2839]"}`}
                   >
                     <span className="material-symbols-outlined">credit_card</span>
-                    Subscription
+                    {t("profile.subscription")}
                   </button>
                 </nav>
               </aside>
