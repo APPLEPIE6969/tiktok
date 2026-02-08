@@ -3,7 +3,7 @@ import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Lumina AI - Learn Anything, Powered by AI",
+  title: "StudyFlow - Learn Anything, Powered by AI",
   description: "Unlock your potential with personalized learning paths, instant feedback, and quizzes generated just for you.",
 };
 
