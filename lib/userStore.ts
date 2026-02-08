@@ -17,6 +17,7 @@ export interface UserProfile {
   image?: string
   agreedToTerms: boolean
   onboardingComplete: boolean
+  tutorialComplete: boolean
   createdAt: string
   stats: UserStats
 }
@@ -39,7 +40,7 @@ const defaultStats: UserStats = {
  */
 export function getUserProfile(): UserProfile | null {
   if (typeof window === "undefined") return null
-  
+
   try {
     const data = localStorage.getItem(STORAGE_KEY)
     if (!data) return null
@@ -54,21 +55,22 @@ export function getUserProfile(): UserProfile | null {
  */
 export function saveUserProfile(profile: Partial<UserProfile> & { email: string }): UserProfile {
   const existing = getUserProfile()
-  
+
   const newProfile: UserProfile = {
     name: profile.name || existing?.name || "",
     email: profile.email,
     image: profile.image || existing?.image,
     agreedToTerms: profile.agreedToTerms ?? existing?.agreedToTerms ?? false,
     onboardingComplete: profile.onboardingComplete ?? existing?.onboardingComplete ?? false,
+    tutorialComplete: profile.tutorialComplete ?? existing?.tutorialComplete ?? false,
     createdAt: existing?.createdAt || new Date().toISOString(),
     stats: profile.stats || existing?.stats || { ...defaultStats },
   }
-  
+
   if (typeof window !== "undefined") {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newProfile))
   }
-  
+
   return newProfile
 }
 
@@ -87,10 +89,10 @@ export function clearUserProfile(): void {
 export function isOnboardingComplete(email?: string): boolean {
   const profile = getUserProfile()
   if (!profile) return false
-  
+
   // If email is provided, verify it matches
   if (email && profile.email !== email) return false
-  
+
   return profile.onboardingComplete && profile.agreedToTerms
 }
 
@@ -100,7 +102,29 @@ export function isOnboardingComplete(email?: string): boolean {
 export function updateUserStats(stats: Partial<UserStats>): void {
   const profile = getUserProfile()
   if (!profile) return
-  
+
   profile.stats = { ...profile.stats, ...stats }
   saveUserProfile(profile)
+}
+
+/**
+ * Check if user has completed tutorial
+ */
+export function isTutorialComplete(email?: string): boolean {
+  const profile = getUserProfile()
+  if (!profile) return false
+
+  if (email && profile.email !== email) return false
+
+  return profile.tutorialComplete
+}
+
+/**
+ * Mark tutorial as complete
+ */
+export function markTutorialComplete(email: string): void {
+  const profile = getUserProfile()
+  if (!profile || profile.email !== email) return
+
+  saveUserProfile({ ...profile, tutorialComplete: true })
 }
