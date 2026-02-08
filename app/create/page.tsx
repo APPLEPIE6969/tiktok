@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/i18n"
 
 import { saveQuiz, SavedQuiz } from "@/lib/quizStore"
+import { recordActivity, addXP } from "@/lib/userStore"
+
 
 export default function Create() {
     const router = useRouter()
@@ -79,8 +81,14 @@ export default function Create() {
         }
 
         saveQuiz(newQuizData)
+
+        // Record activity and reward XP
+        recordActivity();
+        addXP(30); // 30 XP for creating a study set
+
         router.push("/quizzes")
     }
+
 
     const addManualTerm = () => {
         setManualTerms([...manualTerms, { term: "", definition: "" }])

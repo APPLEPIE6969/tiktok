@@ -5,6 +5,8 @@ import { useState, useEffect, use } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { QuizQuestion } from "@/lib/ai"
 import { getQuizById, updateQuiz, SavedQuiz } from "@/lib/quizStore"
+import { recordActivity, addXP, updateUserStats, getUserProfile } from "@/lib/userStore"
+
 
 export default function QuizInterface({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params)
@@ -92,9 +94,31 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
         completedAt: new Date().toISOString(),
         score: score,
       });
+
+      // Record activity for streak
+      recordActivity();
+
+      // Calculate XP Reward: 50 base + 10 per correct answer
+      const xpReward = 50 + (score * 10);
+      addXP(xpReward);
+
+      // Update total quizzes and accuracy in global stats
+      const profile = getUserProfile();
+      if (profile) {
+        const totalQuizzes = profile.stats.totalQuizzes + 1;
+        // Simple running average for accuracy
+        const currentAccuracy = profile.stats.accuracyScore || 0;
+        const newAccuracy = Math.round((currentAccuracy * profile.stats.totalQuizzes + (score / quizQuestions.length * 100)) / totalQuizzes);
+
+        updateUserStats({
+          totalQuizzes: totalQuizzes,
+          accuracyScore: newAccuracy
+        });
+      }
     }
     router.push(`/quiz/${id}/results?score=${score}&total=${quizQuestions.length}`);
   };
+
 
   const getAnswerStyle = (option: string) => {
     if (!showFeedback) {
@@ -147,8 +171,8 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
               <p className="text-slate-500 dark:text-[#a69db9] text-sm">{quiz.difficulty} • {quiz.language}</p>
               <div className="flex gap-2 mt-2">
                 <span className={`text-xs px-2 py-1 rounded-full ${instantFeedbackEnabled
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                    : 'bg-slate-100 dark:bg-slate-700/30 text-slate-600 dark:text-slate-400'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                  : 'bg-slate-100 dark:bg-slate-700/30 text-slate-600 dark:text-slate-400'
                   }`}>
                   {instantFeedbackEnabled ? 'Instant Feedback ON' : 'Feedback at End'}
                 </span>
@@ -188,12 +212,12 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
                         }
                       }}
                       className={`aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all ${isCurrent
-                          ? "bg-primary text-white shadow-lg shadow-primary/40 ring-2 ring-primary ring-offset-2 dark:ring-offset-[#131118]"
-                          : isAnswered
-                            ? isCorrect
-                              ? "bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30"
-                              : "bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30"
-                            : "bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10"
+                        ? "bg-primary text-white shadow-lg shadow-primary/40 ring-2 ring-primary ring-offset-2 dark:ring-offset-[#131118]"
+                        : isAnswered
+                          ? isCorrect
+                            ? "bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30"
+                            : "bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30"
+                          : "bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10"
                         }`}
                     >
                       {idx + 1}
@@ -276,12 +300,12 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
                 >
                   <input className="peer sr-only" name="answer" type="radio" checked={isSelected} readOnly />
                   <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 mr-5 transition-colors ${showFeedback && isCorrect
-                      ? "border-green-500 bg-green-500 text-white"
-                      : showFeedback && isSelected && !isCorrect
-                        ? "border-red-500 bg-red-500 text-white"
-                        : isSelected
-                          ? "border-primary bg-primary text-white"
-                          : "border-slate-300 dark:border-white/20 text-slate-500 dark:text-white/40"
+                    ? "border-green-500 bg-green-500 text-white"
+                    : showFeedback && isSelected && !isCorrect
+                      ? "border-red-500 bg-red-500 text-white"
+                      : isSelected
+                        ? "border-primary bg-primary text-white"
+                        : "border-slate-300 dark:border-white/20 text-slate-500 dark:text-white/40"
                     }`}>
                     {showFeedback && isCorrect ? (
                       <span className="material-symbols-outlined text-sm">check</span>
@@ -293,10 +317,10 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
                   </div>
                   <div className="flex-1">
                     <p className={`text-lg font-medium ${showFeedback && isCorrect
-                        ? "text-green-700 dark:text-green-400"
-                        : showFeedback && isSelected && !isCorrect
-                          ? "text-red-700 dark:text-red-400"
-                          : "text-slate-700 dark:text-slate-300"
+                      ? "text-green-700 dark:text-green-400"
+                      : showFeedback && isSelected && !isCorrect
+                        ? "text-red-700 dark:text-red-400"
+                        : "text-slate-700 dark:text-slate-300"
                       }`}>
                       {option}
                     </p>
@@ -316,8 +340,8 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
                 </span>
                 <div>
                   <p className={`font-semibold ${selectedAnswer === currentQuestion.correctAnswer
-                      ? 'text-green-700 dark:text-green-400'
-                      : 'text-amber-700 dark:text-amber-400'
+                    ? 'text-green-700 dark:text-green-400'
+                    : 'text-amber-700 dark:text-amber-400'
                     }`}>
                     {selectedAnswer === currentQuestion.correctAnswer ? 'Correct!' : 'Not quite right'}
                   </p>

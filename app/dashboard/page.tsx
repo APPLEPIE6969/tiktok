@@ -9,8 +9,10 @@ import {
   isOnboardingComplete,
   getUserProfile,
   isTutorialComplete,
+  recordActivity,
   type UserStats
 } from "@/lib/userStore"
+
 import { useLanguage } from "@/lib/i18n"
 import { EmptyState } from "@/components/EmptyState"
 import { TutorialOverlay } from "@/components/TutorialOverlay"
@@ -75,11 +77,15 @@ export default function Dashboard() {
         return
       }
 
+      // Record today's activity
+      recordActivity()
+
       // Load user stats
       const profile = getUserProfile()
       if (profile?.stats) {
         setUserStats(profile.stats)
       }
+
 
       // Check if tutorial should be shown
       if (!isTutorialComplete(session.user.email)) {

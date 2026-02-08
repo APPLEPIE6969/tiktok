@@ -19,6 +19,7 @@ export interface UserProfile {
   onboardingComplete: boolean
   tutorialComplete: boolean
   createdAt: string
+  lastActivityDate?: string // ISO date string (YYYY-MM-DD)
   stats: UserStats
   language?: string // Added language preference
 }
@@ -130,3 +131,65 @@ export function markTutorialComplete(email: string): void {
 
   saveUserProfile({ ...profile, tutorialComplete: true })
 }
+
+/**
+ * Add XP and handle level ups
+ */
+export function addXP(amount: number): void {
+  const profile = getUserProfile()
+  if (!profile) return
+
+  const stats = { ...profile.stats }
+  stats.xpEarned += amount
+
+  while (stats.xpEarned >= stats.xpToNextLevel) {
+    stats.xpEarned -= stats.xpToNextLevel
+    stats.currentLevel += 1
+    // Increase difficulty for next level
+    stats.xpToNextLevel = stats.currentLevel * 100
+  }
+
+  profile.stats = stats
+  saveUserProfile(profile)
+}
+
+/**
+ * Record activity and update streak
+ */
+export function recordActivity(): void {
+  const profile = getUserProfile()
+  if (!profile) return
+
+  const now = new Date()
+  const today = now.toISOString().split("T")[0]
+  const lastDate = profile.lastActivityDate
+
+  if (lastDate === today) {
+    // Already recorded today
+    return
+  }
+
+  const stats = { ...profile.stats }
+
+  if (lastDate) {
+    const last = new Date(lastDate)
+    const diffTime = Math.abs(now.getTime() - last.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 1) {
+      stats.dailyStreak += 1
+    } else {
+      stats.dailyStreak = 1
+    }
+  } else {
+    stats.dailyStreak = 1
+  }
+
+  profile.lastActivityDate = today
+  profile.stats = stats
+  saveUserProfile(profile)
+
+  // Bonus XP for recording activity
+  addXP(20)
+}
+
