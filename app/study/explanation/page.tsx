@@ -248,7 +248,7 @@ export default function SmartExplanation() {
 
         {/* Input Area */}
         <div className="flex-none p-4 md:p-6 bg-white dark:bg-[#131118] border-t border-slate-200 dark:border-surface-dark-lighter animate-fade-in">
-          <div className="relative max-w-4xl mx-auto flex items-end gap-2">
+          <div className="relative max-w-4xl mx-auto flex items-center gap-2">
             <div className="relative flex-1">
               <input
                 className="w-full bg-slate-100 dark:bg-[#0a0a0c] rounded-xl border border-transparent focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 px-4 py-4 pr-14 transition-all outline-none"
