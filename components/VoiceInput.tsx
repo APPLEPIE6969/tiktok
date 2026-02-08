@@ -25,14 +25,22 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
     }
 
     const startRecording = async () => {
-        setIsProcessing(true) // Indicate we are starting/requesting
+        setIsProcessing(true)
+
+        // Check for secure context (required for mic access)
+        if (typeof window !== 'undefined' && !window.isSecureContext) {
+            setIsProcessing(false)
+            alert("Microphone access requires a secure connection (HTTPS). Please ensure you are accessing the site via HTTPS.")
+            return
+        }
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
             const mediaRecorder = new MediaRecorder(stream)
             mediaRecorderRef.current = mediaRecorder
             chunksRef.current = []
 
-            setIsProcessing(false) // Permission granted, now recording
+            setIsProcessing(false)
             setShowPermissionPrompt(false)
 
             mediaRecorder.ondataavailable = (e) => {
@@ -59,12 +67,21 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
             mediaRecorder.start()
             setIsRecording(true)
         } catch (err: any) {
-            console.error("Error accessing microphone:", err)
+            console.error("Detailed Microphone Error:", {
+                name: err.name,
+                message: err.message,
+                stack: err.stack
+            })
             setIsProcessing(false)
+
             if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                 setShowPermissionPrompt(true)
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                alert("No microphone found. Please connect a microphone and try again.")
+            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                alert("Your microphone is currently being used by another application.")
             } else {
-                alert("Could not access microphone. Please ensure your device has a working microphone.")
+                alert(`Microphone error (${err.name}): ${err.message}. Please check your browser settings.`)
             }
         }
     }
@@ -86,7 +103,7 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
                         <p className="font-bold text-sm">Permission Denied</p>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-text-secondary mb-3 leading-relaxed">
-                        It looks like microphone access was denied. Please check your browser settings to allow StudyFlow to use your microphone for voice chat.
+                        It looks like microphone access was denied. Please click the **lock icon** 🔒 in your browser's address bar to reset permissions, then try again.
                     </p>
                     <div className="flex gap-2">
                         <button
