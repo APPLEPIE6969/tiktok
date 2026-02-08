@@ -36,7 +36,7 @@ export function Navbar() {
                 <Link href="/login" className="hidden sm:flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 hover:bg-slate-200 dark:hover:bg-[#2e2839] text-slate-900 dark:text-white text-sm font-semibold transition-colors">
                     Log In
                 </Link>
-                <Link href="/login" className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105">
+                <Link href="/signup" className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105">
                     Sign Up
                 </Link>
             </>
