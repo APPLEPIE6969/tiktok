@@ -67,7 +67,7 @@ export default function Profile() {
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.totalQuizzes || 0}</p>
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
-                  {(stats?.totalQuizzes || 0) === 0 ? t("profile.nothing_to_continue") : t("dashboard.learned_minutes", 0)}
+                  {t("profile.total_quizzes_desc")}
                 </p>
               </div>
               <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-2">
@@ -79,7 +79,7 @@ export default function Profile() {
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.accuracyScore || 0}%</p>
                 </div>
                 <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
-                  {(stats?.accuracyScore || 0) === 0 ? t("profile.nothing_to_continue_desc") : t("dashboard.learned_minutes", 0)}
+                  {t("profile.accuracy_score_desc")}
                 </p>
               </div>
               <div className="flex flex-col gap-1 rounded-2xl p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 relative overflow-hidden group transition-all hover:shadow-lg hover:scale-[1.02] animate-slide-up stagger-3">
@@ -90,7 +90,9 @@ export default function Profile() {
                 <div className="flex items-baseline gap-3 mt-1">
                   <p className="text-slate-900 dark:text-white text-3xl font-bold">{stats?.hoursStudied || 0}h</p>
                 </div>
-                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">{t("profile.daily_streak_full", stats?.dailyStreak || 0)}</p>
+                <p className="text-slate-500 dark:text-text-secondary text-xs mt-2">
+                  {t("dashboard.learned_minutes", Math.round((stats?.hoursStudied || 0) * 60))}
+                </p>
               </div>
             </div>
 
