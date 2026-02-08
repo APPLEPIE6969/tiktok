@@ -20,6 +20,7 @@ export interface UserProfile {
   tutorialComplete: boolean
   createdAt: string
   stats: UserStats
+  language?: string // Added language preference
 }
 
 const STORAGE_KEY = "studyflow_user_profile"
@@ -65,6 +66,7 @@ export function saveUserProfile(profile: Partial<UserProfile> & { email: string 
     tutorialComplete: profile.tutorialComplete ?? existing?.tutorialComplete ?? false,
     createdAt: existing?.createdAt || new Date().toISOString(),
     stats: profile.stats || existing?.stats || { ...defaultStats },
+    language: profile.language || existing?.language || "English",
   }
 
   if (typeof window !== "undefined") {

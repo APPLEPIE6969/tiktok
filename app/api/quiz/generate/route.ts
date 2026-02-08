@@ -1,6 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateQuiz, AIMode, QuizGenerationParams } from "@/lib/ai";
 import { auth } from "@/lib/auth";
+import { z } from "zod";
+import { rateLimit } from "@/lib/ratelimit";
+
+// Initialize rate limiter: 5 requests per minute per IP
+const limiter = rateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 500, // Max 500 users per second
+});
+
+// Input validation schema
+const generateQuizSchema = z.object({
+  topic: z.string().min(1).max(200).optional(),
+  difficulty: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"]).optional(),
+  type: z.enum(["Multiple Choice", "True / False", "Short Answer", "Mix of All"]).optional(),
+  amount: z.union([z.string(), z.number()]).optional(),
+  language: z.string().max(50).optional(),
+  mode: z.enum(["fast", "balanced", "smart"]).optional(),
+  customContent: z.string().max(10000).optional(), // Limit custom content to 10k chars
+  instantFeedback: z.boolean().optional(),
+});
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -8,8 +28,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Rate Limiting
+  const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const token = session.user?.email || ip; // Use email if available, else IP
+  const limit = 10; // 10 requests per minute
+
+  if (!limiter.check(limit, token)) {
+    return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
+  }
+
   try {
     const body = await req.json();
+
+    // Validate Input
+    const result = generateQuizSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: "Invalid input", details: result.error.format() }, { status: 400 });
+    }
+
     const {
       topic,
       difficulty,
@@ -19,16 +55,16 @@ export async function POST(req: NextRequest) {
       mode,
       customContent,
       instantFeedback
-    } = body;
+    } = result.data;
 
     // Validate mode
-    const aiMode: AIMode = ["fast", "balanced", "smart"].includes(mode) ? mode : "balanced";
+    const aiMode: AIMode = mode as AIMode || "balanced";
 
     const params: QuizGenerationParams = {
-      topic,
-      difficulty,
-      type,
-      amount: amount === "recommended" ? "recommended" : parseInt(amount),
+      topic: topic || "General Knowledge",
+      difficulty: difficulty || "Intermediate",
+      type: type || "Mixed",
+      amount: amount === "recommended" ? "recommended" : (typeof amount === 'string' ? parseInt(amount) : amount) || 5,
       language: language || "English",
       customContent: customContent || undefined,
     };

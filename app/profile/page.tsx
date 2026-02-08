@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/Sidebar"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
-import { getUserProfile } from "@/lib/userStore"
+import { getUserProfile, saveUserProfile } from "@/lib/userStore"
 import { EmptyState } from "@/components/EmptyState"
 import { Select } from "@/components/ui/Select"
 import { useState } from "react"
@@ -17,9 +17,17 @@ export default function Profile() {
 
   // State for tabs and settings
   const [activeTab, setActiveTab] = useState("overview")
-  const [language, setLanguage] = useState("English")
+  const [language, setLanguage] = useState(userProfile?.language || "English")
   const [darkMode, setDarkMode] = useState(true)
   const [emailNotifications, setEmailNotifications] = useState(true)
+
+  // Update language in user profile when changed
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage)
+    if (userProfile && session?.user?.email) {
+      saveUserProfile({ ...userProfile, email: session.user.email, language: newLanguage })
+    }
+  }
 
   // Combine session and stored profile data
   const displayName = userProfile?.name || session?.user?.name || "Guest User"
@@ -167,7 +175,7 @@ export default function Profile() {
                     <Select
                       options={LANGUAGES as any}
                       value={language}
-                      onChange={setLanguage}
+                      onChange={handleLanguageChange}
                     />
                   </div>
                 </div>
