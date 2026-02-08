@@ -65,7 +65,7 @@ export default function Home() {
                         </div>
                         <span className="text-xs font-bold text-slate-300">Lumina Assistant</span>
                       </div>
-                      <p className="text-sm text-white">I've analyzed your recent quiz on Quantum Physics. You're strong on "Wave functions" but could use a refresher on "Entanglement". Shall we start a mini-lesson?</p>
+                      <p className="text-sm text-white">I&apos;ve analyzed your recent quiz on Quantum Physics. You&apos;re strong on &quot;Wave functions&quot; but could use a refresher on &quot;Entanglement&quot;. Shall we start a mini-lesson?</p>
                     </div>
                   </div>
                 </div>

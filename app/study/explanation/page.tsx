@@ -1,8 +1,41 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 
 export default function SmartExplanation() {
+  const [query, setQuery] = useState("")
+  const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'ai', content: string}>>([])
+  const [loading, setLoading] = useState(false)
+
+  const handleAsk = async () => {
+    if (!query.trim()) return;
+
+    const userMessage = query;
+    setQuery("");
+    setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
+    setLoading(true);
+
+    try {
+        const response = await fetch("/api/tutor/explain", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                query: userMessage,
+                context: "Physics 101: Light & Optics", // Context from page
+                provider: "groq" // Use Groq for speed as per user suggestion
+            })
+        });
+        const data = await response.json();
+        setChatHistory(prev => [...prev, { role: 'ai', content: data.explanation }]);
+    } catch (error) {
+        console.error("Chat error", error);
+        setChatHistory(prev => [...prev, { role: 'ai', content: "Sorry, I couldn't process that request." }]);
+    } finally {
+        setLoading(false);
+    }
+  };
+
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased selection:bg-primary selection:text-white">
       {/* Header / TopNavBar */}
@@ -190,18 +223,41 @@ export default function SmartExplanation() {
                   </div>
                 </div>
 
-                {/* AI Chat Prompt */}
-                <div className="bg-gradient-to-r from-[#1e182a] to-[#251f30] rounded-xl p-4 border border-[#2e2839] flex items-center gap-4">
-                  <div className="bg-primary/20 p-2 rounded-lg text-primary">
-                    <span className="material-symbols-outlined">chat_spark</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-white font-medium">Still confused? Ask for a different analogy.</p>
-                    <input className="w-full bg-transparent border-none text-sm text-[#a69db9] placeholder-[#5f586b] focus:ring-0 px-0 py-1" placeholder="e.g., 'Explain using ocean waves analogy'..." type="text" />
-                  </div>
-                  <button className="bg-[#2e2839] hover:bg-primary text-white p-2 rounded-lg transition-colors">
-                    <span className="material-symbols-outlined text-lg">send</span>
-                  </button>
+                {/* AI Chat Prompt - Active */}
+                <div className="space-y-4">
+                    {/* Chat History */}
+                    {chatHistory.map((msg, i) => (
+                        <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`p-3 rounded-lg max-w-[80%] text-sm ${msg.role === 'user' ? 'bg-primary text-white' : 'bg-surface-card border border-border text-white'}`}>
+                                {msg.content}
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="bg-gradient-to-r from-[#1e182a] to-[#251f30] rounded-xl p-4 border border-[#2e2839] flex items-center gap-4">
+                        <div className="bg-primary/20 p-2 rounded-lg text-primary">
+                            <span className="material-symbols-outlined">chat_spark</span>
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-sm text-white font-medium">Still confused? Ask for a different analogy.</p>
+                            <input
+                                className="w-full bg-transparent border-none text-sm text-[#a69db9] placeholder-[#5f586b] focus:ring-0 px-0 py-1 focus:outline-none"
+                                placeholder="e.g., 'Explain using ocean waves analogy'..."
+                                type="text"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
+                                disabled={loading}
+                            />
+                        </div>
+                        <button
+                            onClick={handleAsk}
+                            disabled={loading}
+                            className="bg-[#2e2839] hover:bg-primary text-white p-2 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <span className="material-symbols-outlined text-lg animate-spin">refresh</span> : <span className="material-symbols-outlined text-lg">send</span>}
+                        </button>
+                    </div>
                 </div>
               </div>
 

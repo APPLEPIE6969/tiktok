@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: "dashboard" },
@@ -17,6 +18,7 @@ const settingsItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   return (
     <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white dark:border-[#2e2839] dark:bg-[#131118] md:flex h-screen sticky top-0">
@@ -69,11 +71,15 @@ export function Sidebar() {
 
           <div className="mt-4 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-[#2e2839] dark:bg-[#1a1622]">
             <div className="h-10 w-10 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-               {/* Use a placeholder or next/image if url is available */}
-               <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
+               {session?.user?.image ? (
+                   // eslint-disable-next-line @next/next/no-img-element
+                   <img src={session.user.image} alt={session.user.name || "User"} className="h-full w-full object-cover" />
+               ) : (
+                   <div className="h-full w-full bg-gradient-to-br from-primary to-purple-400"></div>
+               )}
             </div>
             <div className="flex flex-1 flex-col">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Alex Smith</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{session?.user?.name || "Guest User"}</p>
               <p className="text-xs text-slate-500 dark:text-[#a69db9]">Level 5 Apprentice</p>
             </div>
           </div>

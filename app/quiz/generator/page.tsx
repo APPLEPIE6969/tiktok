@@ -1,11 +1,101 @@
 "use client"
 
 import { Sidebar } from "@/components/Sidebar"
-import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+
+// Hardcoded for frontend simplicity, normally would import from shared config or API
+const AI_MODELS = {
+    gemini: [
+        { id: "gemini-2.5-flash-lite", name: "Gemini 2.5 Flash Lite" },
+        { id: "gemini-2.5-flash-tts", name: "Gemini 2.5 Flash TTS" },
+        { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash" },
+        { id: "gemini-3-flash-preview", name: "Gemini 3 Flash Preview" },
+        { id: "gemini-robotics-er-1.5-preview", name: "Gemini Robotics ER 1.5 Preview" },
+        { id: "gemma-3-1b", name: "Gemma 3 1B" },
+        { id: "gemma-3-2b", name: "Gemma 3 2B" },
+        { id: "gemma-3-4b", name: "Gemma 3 4B" },
+        { id: "gemma-3-12b", name: "Gemma 3 12B" },
+        { id: "gemma-3-27b", name: "Gemma 3 27B" },
+        { id: "gemini-embedding-1", name: "Gemini Embedding 1" },
+        { id: "gemini-2.5-flash-native-audio-dialog", name: "Gemini 2.5 Flash Native Audio Dialog" },
+    ],
+    groq: [
+        { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B Instant" },
+        { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B Versatile" },
+        { id: "meta-llama/llama-guard-4-12b", name: "Llama Guard 4 12B" },
+        { id: "openai/gpt-oss-120b", name: "OpenAI GPT OSS 120B" },
+        { id: "openai/gpt-oss-20b", name: "OpenAI GPT OSS 20B" },
+        { id: "whisper-large-v3", name: "Whisper Large V3" },
+        { id: "whisper-large-v3-turbo", name: "Whisper Large V3 Turbo" },
+        { id: "groq/compound", name: "GroqCompound" },
+        { id: "groq/compound-mini", name: "GroqCompound Mini" },
+        { id: "canopylabs/orpheus-arabic-saudi", name: "Canopy Orpheus Arabic" },
+        { id: "canopylabs/orpheus-v1-english", name: "Canopy Orpheus English" },
+        { id: "meta-llama/llama-4-maverick-17b-128e-instruct", name: "Llama 4 Maverick 17B" },
+        { id: "meta-llama/llama-4-scout-17b-16e-instruct", name: "Llama 4 Scout 17B" },
+        { id: "meta-llama/llama-prompt-guard-2-22m", name: "Llama Prompt Guard 2" },
+        { id: "meta-llama/llama-prompt-guard-2-86m", name: "Meta Prompt Guard 2" },
+        { id: "moonshotai/kimi-k2-instruct-0905", name: "Moonshot Kimi K2" },
+        { id: "openai/gpt-oss-safeguard-20b", name: "OpenAI Safety GPT OSS 20B" },
+        { id: "qwen/qwen3-32b", name: "Qwen 3 32B" },
+    ]
+}
 
 export default function QuizGenerator() {
   const [inputType, setInputType] = useState<"topic" | "file">("topic")
+  const [topic, setTopic] = useState("")
+  const [difficulty, setDifficulty] = useState("Intermediate")
+  const [questionType, setQuestionType] = useState("Multiple Choice")
+  const [amount, setAmount] = useState("10 Questions")
+  const [provider, setProvider] = useState<"gemini" | "groq">("gemini")
+  const [model, setModel] = useState("gemini-2.5-flash")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const router = useRouter()
+
+  const handleProviderChange = (newProvider: "gemini" | "groq") => {
+      setProvider(newProvider);
+      // Set default model for provider
+      setModel(AI_MODELS[newProvider][0].id);
+  }
+
+  const handleGenerate = async () => {
+    if (!topic) return;
+
+    setIsGenerating(true);
+    try {
+        const response = await fetch("/api/quiz/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                topic,
+                difficulty,
+                type: questionType,
+                amount: parseInt(amount.split(" ")[0]),
+                provider,
+                model
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to generate quiz");
+        }
+
+        const data = await response.json();
+        // Store in localStorage for simplicity in this demo without DB
+        const quizId = Date.now().toString();
+        localStorage.setItem(`quiz_${quizId}`, JSON.stringify(data.quiz));
+
+        router.push(`/quiz/${quizId}`);
+    } catch (error) {
+        console.error("Generation error:", error);
+        alert("Failed to generate quiz. Please try again.");
+    } finally {
+        setIsGenerating(false);
+    }
+  };
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
@@ -57,8 +147,13 @@ export default function QuizGenerator() {
                 <div className="flex flex-col gap-2">
                     <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Topic or Content</label>
                     <div className="relative group">
-                        <textarea className="w-full h-40 bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl p-4 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-text-secondary focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none text-base" placeholder="e.g., Quantum Physics, The History of Rome, or paste a summary..."></textarea>
-                        <div className="absolute bottom-3 right-3 text-xs text-slate-400 dark:text-gray-600 font-medium bg-slate-50 dark:bg-[#131118] px-2 rounded">0/2000</div>
+                        <textarea
+                            className="w-full h-40 bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl p-4 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-text-secondary focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none text-base"
+                            placeholder="e.g., Quantum Physics, The History of Rome, or paste a summary..."
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                        ></textarea>
+                        <div className="absolute bottom-3 right-3 text-xs text-slate-400 dark:text-gray-600 font-medium bg-slate-50 dark:bg-[#131118] px-2 rounded">{topic.length}/2000</div>
                     </div>
                 </div>
             ) : (
@@ -81,7 +176,11 @@ export default function QuizGenerator() {
               <div className="flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Difficulty Level</label>
                 <div className="relative">
-                  <select className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer">
+                  <select
+                    className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer"
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value)}
+                  >
                     <option>Beginner</option>
                     <option>Intermediate</option>
                     <option>Advanced</option>
@@ -95,7 +194,11 @@ export default function QuizGenerator() {
               <div className="flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Question Type</label>
                 <div className="relative">
-                  <select className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer">
+                  <select
+                    className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer"
+                    value={questionType}
+                    onChange={(e) => setQuestionType(e.target.value)}
+                  >
                     <option>Multiple Choice</option>
                     <option>True / False</option>
                     <option>Short Answer</option>
@@ -109,7 +212,11 @@ export default function QuizGenerator() {
               <div className="flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Number of Questions</label>
                 <div className="relative">
-                  <select className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer" defaultValue="10 Questions">
+                  <select
+                    className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  >
                     <option>5 Questions</option>
                     <option>10 Questions</option>
                     <option>15 Questions</option>
@@ -136,13 +243,58 @@ export default function QuizGenerator() {
               </div>
             </div>
 
+            {/* AI Model Settings */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-200 dark:border-[#2e2839] pt-6">
+                <div className="flex flex-col gap-2">
+                    <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">AI Provider</label>
+                    <div className="relative">
+                    <select
+                        className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer"
+                        value={provider}
+                        onChange={(e) => handleProviderChange(e.target.value as "gemini" | "groq")}
+                    >
+                        <option value="gemini">Google Gemini</option>
+                        <option value="groq">Groq (Llama/Mixtral/Others)</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        <span className="material-symbols-outlined">expand_more</span>
+                    </div>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <label className="text-slate-900 dark:text-white text-sm font-bold ml-1">Model</label>
+                    <div className="relative">
+                    <select
+                        className="w-full bg-slate-50 dark:bg-[#131118] border border-slate-200 dark:border-[#2e2839] rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer"
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
+                    >
+                        {AI_MODELS[provider].map((m) => (
+                            <option key={m.id} value={m.id}>{m.name}</option>
+                        ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        <span className="material-symbols-outlined">expand_more</span>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Action Button */}
             <div className="pt-4">
-              <Link href="/quiz/1" className="group w-full bg-primary hover:bg-primary/90 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3 relative overflow-hidden">
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating || !topic}
+                className="group w-full bg-primary hover:bg-primary/90 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3 relative overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
+              >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <span className="material-symbols-outlined relative z-10 animate-bounce">auto_awesome</span>
-                <span className="relative z-10">Generate Quiz</span>
-              </Link>
+                {isGenerating ? (
+                    <span className="material-symbols-outlined relative z-10 animate-spin">refresh</span>
+                ) : (
+                    <span className="material-symbols-outlined relative z-10 animate-bounce">auto_awesome</span>
+                )}
+                <span className="relative z-10">{isGenerating ? "Generating..." : "Generate Quiz"}</span>
+              </button>
               <p className="text-center text-xs text-slate-400 dark:text-gray-600 mt-3">Estimated time: ~15 seconds</p>
             </div>
           </div>

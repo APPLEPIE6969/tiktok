@@ -2,9 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 export function Navbar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   // Hide Navbar on dashboard and quiz routes if they have their own layout/header
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/quiz") || pathname.startsWith("/study") || pathname.startsWith("/profile")) {
@@ -25,12 +27,20 @@ export function Navbar() {
         <Link className="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">About</Link>
       </nav>
       <div className="flex gap-3">
-        <Link href="/login" className="hidden sm:flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 hover:bg-slate-200 dark:hover:bg-[#2e2839] text-slate-900 dark:text-white text-sm font-semibold transition-colors">
-            Log In
-        </Link>
-        <Link href="/login" className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105">
-            Sign Up
-        </Link>
+        {session ? (
+            <Link href="/dashboard" className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105">
+                Dashboard
+            </Link>
+        ) : (
+            <>
+                <Link href="/login" className="hidden sm:flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 hover:bg-slate-200 dark:hover:bg-[#2e2839] text-slate-900 dark:text-white text-sm font-semibold transition-colors">
+                    Log In
+                </Link>
+                <Link href="/login" className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105">
+                    Sign Up
+                </Link>
+            </>
+        )}
       </div>
     </header>
   )
