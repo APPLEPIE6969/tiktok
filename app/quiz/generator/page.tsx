@@ -7,20 +7,38 @@ import { useRouter } from "next/navigation"
 // Hardcoded for frontend simplicity, normally would import from shared config or API
 const AI_MODELS = {
     gemini: [
-        { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash" },
         { id: "gemini-2.5-flash-lite", name: "Gemini 2.5 Flash Lite" },
+        { id: "gemini-2.5-flash-tts", name: "Gemini 2.5 Flash TTS" },
+        { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash" },
         { id: "gemini-3-flash-preview", name: "Gemini 3 Flash Preview" },
+        { id: "gemini-robotics-er-1.5-preview", name: "Gemini Robotics ER 1.5 Preview" },
         { id: "gemma-3-1b", name: "Gemma 3 1B" },
         { id: "gemma-3-2b", name: "Gemma 3 2B" },
         { id: "gemma-3-4b", name: "Gemma 3 4B" },
         { id: "gemma-3-12b", name: "Gemma 3 12B" },
         { id: "gemma-3-27b", name: "Gemma 3 27B" },
+        { id: "gemini-embedding-1", name: "Gemini Embedding 1" },
+        { id: "gemini-2.5-flash-native-audio-dialog", name: "Gemini 2.5 Flash Native Audio Dialog" },
     ],
     groq: [
-        { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B" },
-        { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B" },
-        { id: "mixtral-8x7b-32768", name: "Mixtral 8x7B" },
-        { id: "gemma-7b-it", name: "Gemma 7B" },
+        { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B Instant" },
+        { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B Versatile" },
+        { id: "meta-llama/llama-guard-4-12b", name: "Llama Guard 4 12B" },
+        { id: "openai/gpt-oss-120b", name: "OpenAI GPT OSS 120B" },
+        { id: "openai/gpt-oss-20b", name: "OpenAI GPT OSS 20B" },
+        { id: "whisper-large-v3", name: "Whisper Large V3" },
+        { id: "whisper-large-v3-turbo", name: "Whisper Large V3 Turbo" },
+        { id: "groq/compound", name: "GroqCompound" },
+        { id: "groq/compound-mini", name: "GroqCompound Mini" },
+        { id: "canopylabs/orpheus-arabic-saudi", name: "Canopy Orpheus Arabic" },
+        { id: "canopylabs/orpheus-v1-english", name: "Canopy Orpheus English" },
+        { id: "meta-llama/llama-4-maverick-17b-128e-instruct", name: "Llama 4 Maverick 17B" },
+        { id: "meta-llama/llama-4-scout-17b-16e-instruct", name: "Llama 4 Scout 17B" },
+        { id: "meta-llama/llama-prompt-guard-2-22m", name: "Llama Prompt Guard 2" },
+        { id: "meta-llama/llama-prompt-guard-2-86m", name: "Meta Prompt Guard 2" },
+        { id: "moonshotai/kimi-k2-instruct-0905", name: "Moonshot Kimi K2" },
+        { id: "openai/gpt-oss-safeguard-20b", name: "OpenAI Safety GPT OSS 20B" },
+        { id: "qwen/qwen3-32b", name: "Qwen 3 32B" },
     ]
 }
 
@@ -236,7 +254,7 @@ export default function QuizGenerator() {
                         onChange={(e) => handleProviderChange(e.target.value as "gemini" | "groq")}
                     >
                         <option value="gemini">Google Gemini</option>
-                        <option value="groq">Groq (Llama/Mixtral)</option>
+                        <option value="groq">Groq (Llama/Mixtral/Others)</option>
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                         <span className="material-symbols-outlined">expand_more</span>
