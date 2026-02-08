@@ -12,9 +12,25 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
     const [isRecording, setIsRecording] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const [showPermissionPrompt, setShowPermissionPrompt] = useState(false)
+    const [lastError, setLastError] = useState<string | null>(null)
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
     const chunksRef = useRef<Blob[]>([])
     const { t } = useLanguage()
+
+    // Check permission state on mount if possible
+    useEffect(() => {
+        if (typeof navigator !== 'undefined' && navigator.permissions && (navigator.permissions as any).query) {
+            (navigator.permissions as any).query({ name: 'microphone' }).then((result: any) => {
+                if (result.state === 'denied') {
+                    // Pre-emptively show help if we know it's denied
+                    // Actually clearer to wait for click to avoid annoying users
+                }
+                result.onchange = () => {
+                    if (result.state === 'granted') setShowPermissionPrompt(false)
+                }
+            }).catch(console.error)
+        }
+    }, [])
 
     const handleMicClick = () => {
         if (isRecording) {
@@ -26,11 +42,13 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
 
     const startRecording = async () => {
         setIsProcessing(true)
+        setLastError(null)
 
-        // Check for secure context (required for mic access)
+        // Check for secure context
         if (typeof window !== 'undefined' && !window.isSecureContext) {
             setIsProcessing(false)
-            alert("Microphone access requires a secure connection (HTTPS). Please ensure you are accessing the site via HTTPS.")
+            setLastError("NotSecureContext")
+            setShowPermissionPrompt(true)
             return
         }
 
@@ -67,21 +85,18 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
             mediaRecorder.start()
             setIsRecording(true)
         } catch (err: any) {
-            console.error("Detailed Microphone Error:", {
-                name: err.name,
-                message: err.message,
-                stack: err.stack
-            })
+            console.error("Mic Access Error:", err.name, err.message)
             setIsProcessing(false)
+            setLastError(err.name)
 
-            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError' || err.name === 'NotSecureContext') {
                 setShowPermissionPrompt(true)
             } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
                 alert("No microphone found. Please connect a microphone and try again.")
             } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
                 alert("Your microphone is currently being used by another application.")
             } else {
-                alert(`Microphone error (${err.name}): ${err.message}. Please check your browser settings.`)
+                alert(`Microphone error (${err.name}): ${err.message}`)
             }
         }
     }
@@ -95,26 +110,54 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
 
     return (
         <div className="flex items-center gap-2 relative">
-            {/* Permission Help Pop-up (Shows if denied or explicitly requested) */}
+            {/* Permission Help Pop-up */}
             {showPermissionPrompt && (
-                <div className="absolute bottom-16 right-0 w-64 p-4 bg-white dark:bg-[#1e182a] border border-red-200 dark:border-red-900/30 rounded-2xl shadow-2xl animate-fade-in-up z-50">
-                    <div className="flex items-center gap-2 mb-2 text-red-500">
-                        <span className="material-symbols-outlined text-xl">block</span>
-                        <p className="font-bold text-sm">Permission Denied</p>
+                <div className="absolute bottom-16 right-0 w-80 p-5 bg-white dark:bg-[#1e182a] border border-red-200 dark:border-red-900/30 rounded-2xl shadow-2xl animate-fade-in-up z-50">
+                    <div className="flex items-center gap-2 mb-3 text-red-500">
+                        <span className="material-symbols-outlined text-xl">warning</span>
+                        <p className="font-bold text-sm">Microphone Access Needed</p>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-text-secondary mb-3 leading-relaxed">
-                        It looks like microphone access was denied. Please click the **lock icon** 🔒 in your browser's address bar to reset permissions, then try again.
-                    </p>
+
+                    <div className="space-y-3 mb-4">
+                        <p className="text-xs text-slate-500 dark:text-text-secondary leading-relaxed">
+                            {lastError === "NotSecureContext"
+                                ? "Microphone access requires a secure connection (HTTPS). This site is currently running on a non-secure connection."
+                                : "The browser reported that microphone access is currently blocked. This can happen even if you clicked 'Allow' if there's an OS-level restriction."}
+                        </p>
+
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Troubleshooting Steps:</p>
+                            <ul className="text-[11px] text-slate-500 dark:text-text-secondary space-y-2">
+                                <li className="flex gap-2">
+                                    <span className="text-primary font-bold">1.</span>
+                                    <span>Click the **lock icon** 🔒 next to the URL and reset the Microphone permission to "Allow".</span>
+                                </li>
+                                <li className="flex gap-2">
+                                    <span className="text-primary font-bold">2.</span>
+                                    <span>Check **Windows Settings &gt; Privacy &gt; Microphone** and ensure "Allow apps to access your microphone" is ON.</span>
+                                </li>
+                                <li className="flex gap-2">
+                                    <span className="text-primary font-bold">3.</span>
+                                    <span>Ensure no other app (like Zoom or Teams) is exclusively using the microphone.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {lastError && lastError !== "NotSecureContext" && (
+                            <p className="text-[10px] text-slate-400 font-mono italic text-center">Technical Error: {lastError}</p>
+                        )}
+                    </div>
+
                     <div className="flex gap-2">
                         <button
                             onClick={startRecording}
-                            className="flex-1 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors"
+                            className="flex-1 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
                         >
                             Try Again
                         </button>
                         <button
                             onClick={() => setShowPermissionPrompt(false)}
-                            className="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-text-secondary text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-text-secondary text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         >
                             Dismiss
                         </button>
