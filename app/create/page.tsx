@@ -99,17 +99,19 @@ export default function Create() {
             <Sidebar />
 
             <main className="flex flex-1 flex-col overflow-y-auto bg-background-light dark:bg-background-dark transition-colors duration-300">
-                <div className="flex-1 max-w-5xl mx-auto w-full p-6 md:p-10 animate-fade-in">
-
-                    <div className="flex items-center gap-4 mb-8">
-                        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full">
+                <div className="flex-1 max-w-5xl mx-auto w-full p-6 md:p-10">
+                    <div className="flex items-center gap-4 mb-8 animate-fade-in transition-all">
+                        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full hover:bg-white dark:hover:bg-white/10 shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-white/10 bg-slate-100 dark:bg-surface-dark-lighter">
                             <ArrowLeft className="h-5 w-5" />
                         </Button>
-                        <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t("create.title")}</h1>
-                            <p className="text-slate-500 dark:text-slate-400">{t("create.subtitle")}</p>
+                        <div className="animate-slide-up stagger-1">
+                            <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none mb-1">
+                                {t("create.title")}
+                            </h1>
+                            <p className="text-slate-500 dark:text-text-secondary font-medium">{t("create.subtitle")}</p>
                         </div>
                     </div>
+
 
                     <div className="grid gap-8">
                         {/* Title Section */}

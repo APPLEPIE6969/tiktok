@@ -2,6 +2,7 @@
 
 import { Sidebar } from "@/components/Sidebar"
 import Link from "next/link"
+import { useLanguage } from "@/lib/i18n"
 
 const resources = [
   {
@@ -43,20 +44,21 @@ const resources = [
 ]
 
 export default function Resources() {
+  const { t } = useLanguage()
   return (
     <div className="flex min-h-screen w-full bg-slate-50 dark:bg-background-dark">
       <Sidebar />
       <main className="flex-1 p-8">
         <div className="max-w-4xl mx-auto w-full">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Resources Library</h1>
-          <p className="text-slate-500 dark:text-text-secondary mb-8">Curated guides and tools to supercharge your learning experience.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 animate-fade-in">{t("nav.resources")}</h1>
+          <p className="text-slate-500 dark:text-text-secondary mb-8 animate-fade-in stagger-1">{t("dashboard.no_courses_desc")}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {resources.map((res, i) => (
               <Link
                 key={i}
                 href={res.href}
-                className="group flex flex-col p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer"
+                className={`group flex flex-col p-6 bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer animate-fade-in-up stagger-${(i % 5) + 1}`}
               >
                 <div className={`size-12 rounded-xl ${res.bgColor} flex items-center justify-center ${res.color} mb-4 group-hover:scale-110 transition-transform`}>
                   <span className="material-symbols-outlined text-2xl">{res.icon}</span>

@@ -78,7 +78,7 @@ export default function Courses() {
           {courses.length > 0 && (
             <Link
               href="/courses/create"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:scale-105"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:scale-105 animate-fade-in stagger-1"
             >
               <span className="material-symbols-outlined text-lg">add</span>
               {t("common.create")}
@@ -92,7 +92,7 @@ export default function Courses() {
               <Link
                 key={course.id}
                 href={`/courses/${course.id}`}
-                className={`group bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer animate-fade-in-up stagger-${index + 1}`}
+                className={`group bg-white dark:bg-surface-dark-lighter border border-slate-200 dark:border-surface-dark-lighter/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer animate-fade-in-up stagger-${(index % 5) + 1}`}
               >
                 <div
                   className="h-40 bg-cover bg-center"
@@ -128,8 +128,8 @@ export default function Courses() {
             ))}
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="rounded-2xl bg-white dark:bg-surface-dark-lighter shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10 max-w-md w-full">
+          <div className="flex-1 flex items-center justify-center animate-fade-in-up stagger-1">
+            <div className="rounded-2xl bg-white dark:bg-surface-dark-lighter shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10 max-w-md w-full hover:shadow-md transition-shadow">
               <EmptyState
                 icon="school"
                 title={t("dashboard.no_courses")}
@@ -140,6 +140,7 @@ export default function Courses() {
             </div>
           </div>
         )}
+
       </main>
     </div>
   )

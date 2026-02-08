@@ -135,7 +135,7 @@ export default function SmartExplanation() {
 
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
         {/* Header */}
-        <header className="flex-none flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-surface-dark-lighter bg-white dark:bg-[#131118] z-10">
+        <header className="flex-none flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-surface-dark-lighter bg-white dark:bg-[#131118] z-10 animate-fade-in">
           <div className="flex items-center gap-4">
             <div className={`p-2 rounded-lg ${selectedSubject.bg} ${selectedSubject.color}`}>
               <span className="material-symbols-outlined">{selectedSubject.icon}</span>
@@ -166,7 +166,7 @@ export default function SmartExplanation() {
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
           {chatHistory.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-80">
+            <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-80 animate-fade-in-up">
               <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
                 <span className="material-symbols-outlined text-5xl text-primary">school</span>
               </div>
@@ -189,7 +189,7 @@ export default function SmartExplanation() {
           ) : (
             <>
               {chatHistory.map((msg, i) => (
-                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
                   {msg.role === 'ai' && (
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
                       <span className="material-symbols-outlined text-sm text-primary">smart_toy</span>
@@ -209,7 +209,7 @@ export default function SmartExplanation() {
                 </div>
               ))}
               {loading && (
-                <div className="flex gap-4 justify-start">
+                <div className="flex gap-4 justify-start animate-fade-in-up">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
                     <span className="material-symbols-outlined text-sm text-primary">smart_toy</span>
                   </div>
@@ -228,7 +228,7 @@ export default function SmartExplanation() {
         </div>
 
         {/* Input Area */}
-        <div className="flex-none p-4 md:p-6 bg-white dark:bg-[#131118] border-t border-slate-200 dark:border-surface-dark-lighter">
+        <div className="flex-none p-4 md:p-6 bg-white dark:bg-[#131118] border-t border-slate-200 dark:border-surface-dark-lighter animate-fade-in">
           <div className="relative max-w-4xl mx-auto flex items-end gap-2">
             <div className="relative flex-1">
               <input
