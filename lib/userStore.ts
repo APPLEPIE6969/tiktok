@@ -68,6 +68,7 @@ export function saveUserProfile(profile: Partial<UserProfile> & { email: string 
     createdAt: existing?.createdAt || new Date().toISOString(),
     stats: profile.stats || existing?.stats || { ...defaultStats },
     language: profile.language || existing?.language || "English",
+    lastActivityDate: profile.lastActivityDate || existing?.lastActivityDate,
   }
 
   if (typeof window !== "undefined") {
@@ -188,8 +189,5 @@ export function recordActivity(): void {
   profile.lastActivityDate = today
   profile.stats = stats
   saveUserProfile(profile)
-
-  // Bonus XP for recording activity
-  addXP(20)
 }
 
