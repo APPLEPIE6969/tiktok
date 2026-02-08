@@ -9,12 +9,11 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, FileText, Plus, Trash2, Loader2, Save, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
-import { useTheme } from "@/components/ThemeProvider"
+
 import { saveQuiz, SavedQuiz } from "@/lib/quizStore"
 
 export default function Create() {
     const router = useRouter()
-    const { theme } = useTheme()
     const [activeTab, setActiveTab] = useState<"ai" | "manual">("ai")
     const [title, setTitle] = useState("")
     const [topic, setTopic] = useState("")

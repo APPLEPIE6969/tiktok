@@ -48,9 +48,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Prevent flash of incorrect theme
-    if (!mounted) {
-        return <>{children}</>
-    }
+    // We still render the provider to avoid "context missing" errors during SSR
+    // The "mounted" check is used for the effect, not for rendering the provider itself
 
     return (
         <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
