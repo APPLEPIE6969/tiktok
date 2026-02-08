@@ -168,6 +168,7 @@ const translations: Record<string, Record<string, string>> = {
         "common.delete_confirm": "Are you sure? This action cannot be undone.",
         "common.retake": "Retake",
         "common.start": "Start",
+        "common.create": "Create",
     },
     Spanish: {
         "nav.dashboard": "Panel de Control",
@@ -321,6 +322,7 @@ const translations: Record<string, Record<string, string>> = {
         "common.delete_confirm": "¿Estás seguro? Esta acción no se puede deshacer.",
         "common.retake": "Reintentar",
         "common.start": "Comenzar",
+        "common.create": "Crear",
     },
     French: {
         "nav.dashboard": "Tableau de Bord",
@@ -474,6 +476,7 @@ const translations: Record<string, Record<string, string>> = {
         "common.delete_confirm": "Êtes-vous sûr ? Cette action est irréversible.",
         "common.retake": "Recommencer",
         "common.start": "Démarrer",
+        "common.create": "Créer",
     },
     German: {
         "nav.dashboard": "Übersicht",
@@ -627,6 +630,7 @@ const translations: Record<string, Record<string, string>> = {
         "common.delete_confirm": "Bist du sicher? Dies kann nicht rückgängig gemacht werden.",
         "common.retake": "Wiederholen",
         "common.start": "Starten",
+        "common.create": "Erstellen",
     },
     Dutch: {
         "nav.dashboard": "Dashboard",
@@ -780,6 +784,7 @@ const translations: Record<string, Record<string, string>> = {
         "common.delete_confirm": "Weet je het zeker? Dit kan niet ongedaan worden gemaakt.",
         "common.retake": "Opnieuw",
         "common.start": "Start",
+        "common.create": "Maken",
     },
 
 }
