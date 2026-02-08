@@ -111,9 +111,14 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
         const currentAccuracy = profile.stats.accuracyScore || 0;
         const newAccuracy = Math.round((currentAccuracy * profile.stats.totalQuizzes + (score / quizQuestions.length * 100)) / totalQuizzes);
 
+        // Record study time: 0.5 mins per question
+        const currentHours = profile.stats.hoursStudied || 0;
+        const additionalHours = (quizQuestions.length * 0.5) / 60;
+
         updateUserStats({
           totalQuizzes: totalQuizzes,
-          accuracyScore: newAccuracy
+          accuracyScore: newAccuracy,
+          hoursStudied: parseFloat((currentHours + additionalHours).toFixed(2))
         });
       }
       router.push(`/quiz/${id}/results?score=${score}&total=${quizQuestions.length}&xp=${xpReward}`);
