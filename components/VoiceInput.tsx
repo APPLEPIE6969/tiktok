@@ -13,6 +13,12 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
     const [isProcessing, setIsProcessing] = useState(false)
     const [showPermissionPrompt, setShowPermissionPrompt] = useState(false)
     const [lastError, setLastError] = useState<string | null>(null)
+    const [diagInfo, setDiagInfo] = useState<{
+        protocol: string;
+        secureContext: boolean;
+        hasMediaDevices: boolean;
+        permissionState: string;
+    } | null>(null)
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
     const chunksRef = useRef<Blob[]>([])
     const { t } = useLanguage()
@@ -44,10 +50,33 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
         setIsProcessing(true)
         setLastError(null)
 
+        // Collect diagnostics
+        const info = {
+            protocol: typeof window !== 'undefined' ? window.location.protocol : 'N/A',
+            secureContext: typeof window !== 'undefined' ? window.isSecureContext : false,
+            hasMediaDevices: !!(navigator?.mediaDevices),
+            permissionState: 'unknown'
+        }
+
+        if (navigator.permissions && (navigator.permissions as any).query) {
+            try {
+                const result = await (navigator.permissions as any).query({ name: 'microphone' });
+                info.permissionState = result.state;
+            } catch (e) { }
+        }
+        setDiagInfo(info)
+
         // Check for secure context
         if (typeof window !== 'undefined' && !window.isSecureContext) {
             setIsProcessing(false)
             setLastError("NotSecureContext")
+            setShowPermissionPrompt(true)
+            return
+        }
+
+        if (!info.hasMediaDevices) {
+            setIsProcessing(false)
+            setLastError("NoMediaDevices")
             setShowPermissionPrompt(true)
             return
         }
@@ -138,13 +167,22 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
                                 </li>
                                 <li className="flex gap-2">
                                     <span className="text-primary font-bold">3.</span>
-                                    <span>Ensure no other app (like Zoom or Teams) is exclusively using the microphone.</span>
+                                    <span>If on a laptop, ensure the physical privacy slider on your webcam/mic is open.</span>
                                 </li>
                             </ul>
                         </div>
 
-                        {lastError && lastError !== "NotSecureContext" && (
-                            <p className="text-[10px] text-slate-400 font-mono italic text-center">Technical Error: {lastError}</p>
+                        {diagInfo && (
+                            <div className="bg-slate-100/50 dark:bg-black/20 p-2 rounded-lg border border-dashed border-slate-200 dark:border-slate-800">
+                                <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Technical Info (Share with support):</p>
+                                <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] font-mono text-slate-400">
+                                    <div>Protocol: {diagInfo.protocol}</div>
+                                    <div>Secure: {diagInfo.secureContext ? "YES" : "NO"}</div>
+                                    <div>MediaAPI: {diagInfo.hasMediaDevices ? "YES" : "NO"}</div>
+                                    <div>State: {diagInfo.permissionState}</div>
+                                </div>
+                                {lastError && <div className="mt-1 text-[9px] font-mono text-red-400/80">Error: {lastError}</div>}
+                            </div>
                         )}
                     </div>
 
