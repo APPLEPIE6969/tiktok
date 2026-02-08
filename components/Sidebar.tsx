@@ -26,7 +26,7 @@ export function Sidebar() {
         <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
           <span className="material-symbols-outlined text-xl">school</span>
         </div>
-        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">LearnAI</h1>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">StudyFlow</h1>
       </div>
 
       <div className="flex flex-1 flex-col justify-between overflow-y-auto px-4 py-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">

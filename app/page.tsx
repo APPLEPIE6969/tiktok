@@ -63,7 +63,7 @@ export default function Home() {
                         <div className="size-6 rounded-full bg-primary flex items-center justify-center">
                           <span className="material-symbols-outlined text-[14px] text-white">smart_toy</span>
                         </div>
-                        <span className="text-xs font-bold text-slate-300">Lumina Assistant</span>
+                        <span className="text-xs font-bold text-slate-300">StudyFlow Assistant</span>
                       </div>
                       <p className="text-sm text-white">I&apos;ve analyzed your recent quiz on Quantum Physics. You&apos;re strong on &quot;Wave functions&quot; but could use a refresher on &quot;Entanglement&quot;. Shall we start a mini-lesson?</p>
                     </div>
@@ -199,7 +199,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">auto_awesome</span>
-            <span className="font-bold text-white text-lg">Lumina AI</span>
+            <span className="font-bold text-white text-lg">StudyFlow</span>
           </div>
           <div className="flex gap-8 flex-wrap justify-center">
             <a className="hover:text-primary transition-colors" href="#">Privacy Policy</a>
@@ -208,7 +208,7 @@ export default function Home() {
             <a className="hover:text-primary transition-colors" href="#">Twitter</a>
           </div>
           <div>
-              © 2023 Lumina AI Inc.
+              © 2023 StudyFlow Inc.
           </div>
         </div>
       </footer>

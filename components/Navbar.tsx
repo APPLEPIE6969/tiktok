@@ -19,7 +19,7 @@ export function Navbar() {
         <div className="size-8 flex items-center justify-center text-primary">
           <span className="material-symbols-outlined text-3xl">auto_awesome</span>
         </div>
-        <Link href="/" className="text-xl font-bold leading-tight tracking-tight">Lumina AI</Link>
+        <Link href="/" className="text-xl font-bold leading-tight tracking-tight">StudyFlow</Link>
       </div>
       <nav className="hidden md:flex items-center gap-8">
         <Link className="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Features</Link>

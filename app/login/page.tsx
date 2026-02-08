@@ -100,7 +100,7 @@ export default function Login() {
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-white">
             <span className="material-symbols-outlined text-2xl">auto_awesome</span>
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">LearnAI</span>
+          <span className="text-xl font-bold tracking-tight text-white">StudyFlow</span>
         </div>
 
         {/* Content Area */}
