@@ -17,7 +17,7 @@ const resources = [
   {
     title: "Effective Memory Techniques",
     description: "A summary of active recall and spaced repetition methods for students.",
-    icon: "brain",
+    icon: "psychology",
     type: "Article",
     color: "text-emerald-500",
     bgColor: "bg-emerald-100 dark:bg-emerald-500/10",
@@ -51,7 +51,7 @@ export default function Resources() {
       <main className="flex-1 p-8">
         <div className="max-w-4xl mx-auto w-full">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 animate-fade-in">{t("nav.resources")}</h1>
-          <p className="text-slate-500 dark:text-text-secondary mb-8 animate-fade-in stagger-1">{t("dashboard.no_courses_desc")}</p>
+          <p className="text-slate-500 dark:text-text-secondary mb-8 animate-fade-in stagger-1">Discover guides and articles to help you master your study routine.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {resources.map((res, i) => (
