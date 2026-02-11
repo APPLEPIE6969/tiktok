@@ -20,6 +20,7 @@ const translations: Record<string, Record<string, string>> = {
         "nav.dashboard": "Dashboard",
         "nav.courses": "My Courses",
         "nav.quizzes": "Quizzes",
+        "nav.study_sets": "Study Sets",
         "nav.tutor": "AI Tutor",
         "nav.resources": "Resources",
         "nav.settings": "Settings",
