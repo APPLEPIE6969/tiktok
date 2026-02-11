@@ -17,6 +17,7 @@ import { useLanguage } from "@/lib/i18n"
 import { EmptyState } from "@/components/EmptyState"
 import { TutorialOverlay } from "@/components/TutorialOverlay"
 import { AnimatedDropdown } from "@/components/AnimatedDropdown"
+import { useTheme } from "@/components/ThemeProvider"
 
 const defaultStats: UserStats = {
   totalQuizzes: 0,
@@ -62,6 +63,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [showTutorial, setShowTutorial] = useState(false)
   const [activityPeriod, setActivityPeriod] = useState("week")
+  const { theme, toggleTheme } = useTheme()
 
   // Check authentication and onboarding
   useEffect(() => {
@@ -129,10 +131,11 @@ export default function Dashboard() {
 
       <Sidebar />
 
+
       {/* Main Content */}
-      <main className="flex flex-1 flex-col overflow-y-auto">
-        {/* Header */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-6 backdrop-blur-md dark:border-white/5 dark:bg-background-dark/80">
+      <main className="flex flex-1 flex-col overflow-y-auto bg-slate-50 dark:bg-background-dark">
+        {/* Floating Header */}
+        <header className="sticky top-4 z-20 mx-4 mb-4 flex h-16 items-center justify-between rounded-2xl border border-slate-200 bg-white/80 px-6 backdrop-blur-md shadow-sm dark:border-white/5 dark:bg-[#131118]/80 transition-all">
           <div className="flex items-center gap-4 md:hidden">
             <button className="text-slate-500 hover:text-slate-900 dark:text-white">
               <span className="material-symbols-outlined">menu</span>
@@ -142,10 +145,10 @@ export default function Dashboard() {
 
           {/* Search */}
           <div className="hidden flex-1 md:flex max-w-md">
-            <div className="relative w-full">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <div className="relative w-full group">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
               <input
-                className="h-10 w-full rounded-xl border-none bg-slate-100 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary dark:bg-surface-dark-lighter dark:text-white dark:placeholder-text-secondary"
+                className="h-10 w-full rounded-xl border-none bg-slate-100 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary/50 dark:bg-surface-dark-lighter dark:text-white dark:placeholder-text-secondary transition-all"
                 placeholder={t("dashboard.search_placeholder")}
                 type="text"
               />
@@ -154,13 +157,20 @@ export default function Dashboard() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-white/10">
+            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-white/10 relative">
               <span className="material-symbols-outlined">notifications</span>
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#131118]"></span>
             </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-white/10">
-              <span className="material-symbols-outlined">dark_mode</span>
+            <button
+              onClick={toggleTheme}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-all hover:bg-slate-200 hover:scale-105 dark:bg-surface-dark-lighter dark:text-white dark:hover:bg-white/10"
+              title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              <span className="material-symbols-outlined">
+                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+              </span>
             </button>
-            <div className="h-8 w-8 overflow-hidden rounded-full md:hidden">
+            <div className="h-9 w-9 overflow-hidden rounded-full ring-2 ring-white dark:ring-white/10 md:hidden shadow-md">
               <div className="h-full w-full bg-linear-to-br from-primary to-purple-400"></div>
             </div>
           </div>

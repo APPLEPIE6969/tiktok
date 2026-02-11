@@ -98,9 +98,9 @@ export default function QuizInterface({ params }: { params: Promise<{ id: string
       // Record activity for streak
       recordActivity();
 
-      // Calculate XP Reward: (Correct * 20) + (Incorrect * 5) + 10 bonus
-      const incorrectCount = quizQuestions.length - score;
-      const xpReward = (score * 20) + (incorrectCount * 5) + 10;
+      // Calculate XP Reward: (Correct * 20) + 10 bonus for completion
+      // Incorrect answers do NOT give XP
+      const xpReward = (score * 20) + 10;
       addXP(xpReward);
 
       // Update total quizzes and accuracy in global stats

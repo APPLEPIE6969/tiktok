@@ -211,23 +211,30 @@ export function VoiceInput({ onAudioSend, disabled }: VoiceInputProps) {
                     ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
                     : isProcessing
                         ? "bg-primary/50 text-white cursor-wait animate-pulse"
-                        : "bg-primary hover:bg-primary/90 text-white"
+                        : lastError === "NotAllowedError" || lastError === "PermissionDeniedError" || diagInfo?.permissionState === 'denied'
+                            ? "bg-red-500 hover:bg-red-600 text-white"
+                            : "bg-primary hover:bg-primary/90 text-white"
                     }`}
-                title={isRecording ? t("tutor.stop") : t("tutor.voice_mode")}
+                title={isRecording ? t("tutor.stop") : lastError ? "Microphone Access Blocked" : t("tutor.voice_mode")}
             >
                 {isProcessing ? (
                     <span className="material-symbols-outlined animate-spin text-xl">refresh</span>
                 ) : isRecording ? (
                     <span className="material-symbols-outlined text-xl">stop</span>
+                ) : lastError === "NotAllowedError" || lastError === "PermissionDeniedError" || diagInfo?.permissionState === 'denied' ? (
+                    <span className="material-symbols-outlined text-xl">mic_off</span>
                 ) : (
                     <span className="material-symbols-outlined text-xl">mic</span>
                 )}
             </button>
 
             {isRecording && (
-                <span className="text-xs font-medium text-red-500 animate-pulse bg-red-50 dark:bg-red-900/10 px-2 py-1 rounded-full">
-                    {t("tutor.listening")}
-                </span>
+                <div className="absolute right-full mr-4 flex items-center gap-2 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 rounded-full border border-red-100 dark:border-red-900/30 whitespace-nowrap animate-fade-in">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-bold text-red-600 dark:text-red-400">
+                        {t("tutor.listening")}
+                    </span>
+                </div>
             )}
 
             {isProcessing && (

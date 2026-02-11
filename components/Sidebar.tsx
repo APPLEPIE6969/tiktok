@@ -7,6 +7,8 @@ import { getUserProfile } from "@/lib/userStore"
 
 import { useLanguage } from "@/lib/i18n"
 
+import { useTheme } from "@/components/ThemeProvider"
+
 const sidebarItems = [
   { name: "nav.dashboard", href: "/dashboard", icon: "dashboard" },
   { name: "nav.courses", href: "/courses", icon: "menu_book" },
@@ -25,6 +27,7 @@ export function Sidebar() {
   const { data: session } = useSession()
   const userProfile = getUserProfile()
   const { t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white dark:border-surface-dark-lighter/50 dark:bg-surface-dark md:flex h-screen sticky top-0">
@@ -72,6 +75,18 @@ export function Sidebar() {
               </Link>
             )
           })}
+
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-text-secondary dark:hover:bg-surface-dark-lighter dark:hover:text-white transition-colors w-full text-left"
+          >
+            <span className="material-symbols-outlined">
+              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+            <span className="text-sm font-medium">
+              {theme === 'dark' ? (t("theme.light") || "Light Mode") : (t("theme.dark") || "Dark Mode")}
+            </span>
+          </button>
 
           <div className="mt-4 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-surface-dark-lighter/50 dark:bg-surface-dark-lighter">
             <div className="h-10 w-10 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
